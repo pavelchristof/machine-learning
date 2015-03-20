@@ -1,5 +1,3 @@
-{-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE GADTs #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE KindSignatures #-}
 module Data.ML.Model where
@@ -14,9 +12,6 @@ class (Traversable m, Additive m) => Model (m :: * -> *) where
     type Input m :: * -> *
     type Output m :: * -> *
     predict :: Floating a => Input m a -> m a -> Output m a
-
-data AModel a b where
-    AModel :: Model m => (forall a. m a) -> AModel (Input m) (Output m)
 
 -- | A composition of models.
 data CompositeModel f g a = CompositeModel (f a) (g a)
@@ -51,5 +46,6 @@ instance (Model f, Model g, Output f ~ Input g) => Model (CompositeModel f g) wh
     predict x (CompositeModel f g) = predict (predict x f) g
 
 -- | Chains two models.
-(|>) :: AModel a b -> AModel b c -> AModel a c
-AModel a |> AModel b = AModel (CompositeModel a b)
+(|>) :: Model f => Model g => Output f ~ Input g
+     => f a -> g a -> CompositeModel f g a
+(|>) = CompositeModel

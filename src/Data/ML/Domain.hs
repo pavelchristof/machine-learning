@@ -51,6 +51,7 @@ newtype OrdDomain k a = OrdDomain (Map k a)
 
 type instance Key (OrdDomain k) = k
 
+deriving instance (Show k, Show a) => Show (OrdDomain k a)
 deriving instance Functor (OrdDomain k)
 deriving instance Keyed (OrdDomain k)
 deriving instance Ord k => Lookup (OrdDomain k)
@@ -60,7 +61,10 @@ deriving instance Ord k => Zip (OrdDomain k)
 deriving instance Ord k => ZipWithKey (OrdDomain k)
 deriving instance Foldable (OrdDomain k)
 deriving instance FoldableWithKey (OrdDomain k)
-deriving instance Ord k => Additive (OrdDomain k)
+
+instance (Ord k, Enum k, Bounded k) => Additive (OrdDomain k) where
+    zero = pure 0
+
 
 instance Traversable (OrdDomain k) where
     traverse f (OrdDomain m) = fmap OrdDomain (traverse f m)
@@ -82,6 +86,7 @@ data SparseOrdDomain k a = SparseOrdDomain (Map k a) a
 
 type instance Key (SparseOrdDomain k) = k
 
+deriving instance (Show k, Show a) => Show (SparseOrdDomain k a)
 deriving instance Functor (SparseOrdDomain k)
 
 instance Ord k => Lookup (SparseOrdDomain k) where
@@ -123,8 +128,6 @@ instance Ord k => Applicative (SparseOrdDomain k) where
 
 instance Ord k => Additive (SparseOrdDomain k) where
     zero = pure 0
-    (^+^) = liftA2 (+)
-    (^-^) = liftA2 (-)
 
 instance Ord k => Domain (SparseOrdDomain k)
 instance (Ord k, Enum k, Bounded k) => FiniteDomain (SparseOrdDomain k)

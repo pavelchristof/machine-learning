@@ -12,6 +12,7 @@ cabal-version:       >=1.10
 library
   exposed-modules:     Data.ML.Domain
                        Data.ML.Model
+                       Data.ML.Model.Dynamic
                        Data.ML.Matrix
                        Data.ML.Monoid.MatrixMult
                        Data.ML.Internal.Domain

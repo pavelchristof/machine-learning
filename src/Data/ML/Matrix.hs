@@ -6,6 +6,7 @@ module Data.ML.Matrix where
 
 import Control.Applicative
 import Data.Foldable
+import Data.Monoid
 import Data.Traversable
 import GHC.TypeLits
 import Linear
@@ -25,7 +26,7 @@ type Matrix' (size :: Nat) a = Matrix size size a
 -- | A linear view of a matrix.
 newtype MatrixLV (rows :: Nat) (cols :: Nat) a
     = MatrixLV { getMatrix :: Matrix rows cols a }
-    deriving (Num, Fractional, Floating)
+    deriving (Show, Num, Fractional, Floating)
 
 -- | A linear view of a square matrix.
 type MatrixLV' (size :: Nat) = MatrixLV size size
@@ -54,3 +55,11 @@ instance (KnownNat rows, KnownNat cols) => Additive (MatrixLV rows cols) where
         MatrixLV (liftU2 (liftU2 h) m m')
     liftI2 h (MatrixLV m) (MatrixLV m') =
         MatrixLV (liftI2 (liftI2 h) m m')
+
+-- | Monoid of matrices under multiplication.
+newtype MatrixProd (size :: Nat) a =
+    MatrixProd { getMatrixProd :: Matrix' size a }
+
+instance (KnownNat size, Num a) => Monoid (MatrixProd size a) where
+    mempty = MatrixProd identity
+    MatrixProd m `mappend` MatrixProd m' = MatrixProd (m !*! m')
