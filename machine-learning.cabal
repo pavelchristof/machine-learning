@@ -11,10 +11,13 @@ cabal-version:       >=1.10
 
 library
   exposed-modules:     Data.ML.Domain
+                       Data.ML.Model
+                       Data.ML.Matrix
+                       Data.ML.Monoid.MatrixMult
                        Data.ML.Internal.Domain
   default-extensions:  FlexibleContexts, FlexibleInstances, ScopedTypeVariables
   build-depends:       base <5, linear >= 1.18 && <2, containers >= 0.5 && <1,
                        ad == 4.*, keys == 3.*, lens == 4.*, reflection == 1.*,
-                       semigroups
+                       semigroups == 0.*, transformers == 0.*
   hs-source-dirs:      src
   default-language:    Haskell2010
