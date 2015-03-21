@@ -24,10 +24,14 @@ import Data.Traversable
 import Linear
 
 -- | A machine learning model.
-class (Traversable m, Metric m, Serial1 m) => Model m where
+class Model m where
     type Input m :: * -> *
     type Output m :: * -> *
     predict :: Floating a => Input m a -> m a -> Output m a
+
+-- | Generates a model with an applicative.
+generate :: (Applicative f, Applicative g, Traversable g) => f a -> f (g a)
+generate f = traverse (const f) (pure ())
 
 -- | A model that passes through its input.
 newtype IdentityModel (f :: * -> *) (a :: *) = IdentityModel (V0 a)
@@ -47,6 +51,10 @@ data (f :>> g) a = (f a) :>> (g a)
 
 instance (Functor f, Functor g) => Functor (f :>> g) where
     fmap h (f :>> g) = fmap h f :>> fmap h g
+
+instance (Applicative f, Applicative g) => Applicative (f :>> g) where
+    pure x = pure x :>> pure x
+    (f :>> f') <*> (x :>> x') = (f <*> x) :>> (f' <*> x')
 
 instance (Additive f, Additive g) => Additive (f :>> g) where
     zero = zero :>> zero

@@ -45,10 +45,10 @@ instance (Applicative dom, KnownNat size) => Applicative (MatrixProdModel dom si
 
 instance (Additive dom, KnownNat size) => Additive (MatrixProdModel dom size) where
     zero = MatrixProdModel zero
-    liftU2 h (MatrixProdModel m) (MatrixProdModel m') =
-        MatrixProdModel (liftU2 (liftU2 h) m m')
-    liftI2 h (MatrixProdModel m) (MatrixProdModel m') =
-        MatrixProdModel (liftI2 (liftI2 h) m m')
+    liftU2 f (MatrixProdModel m) (MatrixProdModel m') =
+        MatrixProdModel (liftU2 (liftU2 f) m m')
+    liftI2 f (MatrixProdModel m) (MatrixProdModel m') =
+        MatrixProdModel (liftI2 (liftI2 f) m m')
 
 instance (Foldable dom, Additive dom, KnownNat size) => Metric (MatrixProdModel dom size)
 
@@ -56,7 +56,7 @@ instance (Serial1 dom, KnownNat size) => Serial1 (MatrixProdModel dom size) wher
     serializeWith f (MatrixProdModel m) = serializeWith (serializeWith f) m
     deserializeWith f = MatrixProdModel <$> deserializeWith (deserializeWith f)
 
-instance (DenseDomain dom, KnownNat size) => Model (MatrixProdModel dom size) where
+instance (Indexable dom, KnownNat size) => Model (MatrixProdModel dom size) where
     type Input (MatrixProdModel dom size) = FreeMonoid (Key dom)
     type Output (MatrixProdModel dom size) = MatrixProd size
 
