@@ -3,7 +3,6 @@
 {-# LANGUAGE DeriveFunctor #-}
 {- |
 Module      :  Data.ML.Internal.Compose
-Description :  Functor composition.
 Copyright   :  (c) Paweł Nowak
 License     :  MIT
 

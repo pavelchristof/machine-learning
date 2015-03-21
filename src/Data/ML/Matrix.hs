@@ -8,7 +8,7 @@
 {-# LANGUAGE KindSignatures #-}
 {- |
 Module      :  Data.ML.Matrix
-Description :  Matrices with size known at compile time.
+Description :  Matrices and multiplicative functors.
 Copyright   :  (c) Paweł Nowak
 License     :  MIT
 

@@ -5,6 +5,15 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE KindSignatures #-}
+{- |
+Module      :  Data.ML.Linear
+Description :  Linear map model.
+Copyright   :  (c) Paweł Nowak
+License     :  MIT
+
+Maintainer  :  pawel834@gmail.com
+Stability   :  experimental
+-}
 module Data.ML.Linear where
 
 import Control.Applicative

@@ -6,7 +6,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 {- |
 Module      :  Data.ML.Scalar
-Description :  Scalar functions.
+Description :  Scalar models.
 Copyright   :  (c) Paweł Nowak
 License     :  MIT
 
@@ -41,8 +41,8 @@ import Data.Foldable
 import Data.Functor.Identity
 import Data.ML.Internal.Compose
 import Data.ML.Internal.Scalar
+import Data.ML.Internal.TH
 import Data.ML.Model
-import Data.ML.TH
 import Data.Traversable
 import Linear
 
