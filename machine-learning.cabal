@@ -17,7 +17,8 @@ library
                        Data.ML.Monoid
                        Data.ML.Monoid.MatrixProd
                        Data.ML.Internal.Domain
-  default-extensions:  FlexibleContexts, FlexibleInstances, ScopedTypeVariables
+  default-extensions:  FlexibleContexts, FlexibleInstances, ScopedTypeVariables,
+                       TypeOperators
   build-depends:       base <5, linear >= 1.18 && <2, containers >= 0.5 && <1,
                        ad == 4.*, keys == 3.*, reflection == 1.*,
                        semigroups == 0.*, transformers == 0.*,

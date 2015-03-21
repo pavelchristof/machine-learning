@@ -40,6 +40,7 @@ class ( Zip a
 -- | Finite domain.
 class ( Domain a
       , Foldable a
+      , Metric a
       ) => FiniteDomain a
 
 -- | Dense domain.
@@ -72,6 +73,8 @@ instance (Ord k, Serial k) => Serial1 (OrdDomain k) where
 
 instance (Ord k, Enum k, Bounded k) => Additive (OrdDomain k) where
     zero = pure 0
+
+instance (Ord k, Enum k, Bounded k) => Metric (OrdDomain k)
 
 instance Traversable (OrdDomain k) where
     traverse f (OrdDomain m) = fmap OrdDomain (traverse f m)
@@ -135,6 +138,8 @@ instance Ord k => Applicative (SparseOrdDomain k) where
 
 instance Ord k => Additive (SparseOrdDomain k) where
     zero = pure 0
+
+instance (Ord k, Enum k, Bounded k) => Metric (SparseOrdDomain k)
 
 instance (Ord k, Serial k) => Serial1 (SparseOrdDomain k) where
     serializeWith f (SparseOrdDomain m d) =

@@ -50,6 +50,8 @@ instance (Additive dom, KnownNat size) => Additive (MatrixProdModel dom size) wh
     liftI2 h (MatrixProdModel m) (MatrixProdModel m') =
         MatrixProdModel (liftI2 (liftI2 h) m m')
 
+instance (Foldable dom, Additive dom, KnownNat size) => Metric (MatrixProdModel dom size)
+
 instance (Serial1 dom, KnownNat size) => Serial1 (MatrixProdModel dom size) where
     serializeWith f (MatrixProdModel m) = serializeWith (serializeWith f) m
     deserializeWith f = MatrixProdModel <$> deserializeWith (deserializeWith f)

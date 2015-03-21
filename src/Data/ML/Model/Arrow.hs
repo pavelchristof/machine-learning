@@ -22,5 +22,5 @@ data ModelCat x a b where
     WrapModel :: Model m => m x -> ModelCat x (Input m) (Output m)
 
 instance Category (ModelCat x) where
-    WrapModel m . WrapModel m' = WrapModel (CompositeModel m' m)
+    WrapModel m . WrapModel m' = WrapModel (m' :>> m)
     id = WrapModel (IdentityModel V0)
