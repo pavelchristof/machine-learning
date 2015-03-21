@@ -16,10 +16,10 @@ instance Bounded Letter where
     maxBound = Letter 'z'
 
 type ExampleModel
-    = MonoidHomModel (OrdDomain Letter) (Matrix' 10)
-  :>> LinearModel (Matrix' 10) (Matrix' 5)
+    = MonoidHom (OrdDomain Letter) Quaternion
+  :>> LinearMap Quaternion (Matrix' 5)
   :>> Over (Matrix' 5) Sigmoid
-  :>> LinearModel (Matrix' 5) Scalar
+  :>> LinearMap (Matrix' 5) Scalar
   :>> Sigmoid
 
 predict' :: Floating a => String -> ExampleModel a -> a

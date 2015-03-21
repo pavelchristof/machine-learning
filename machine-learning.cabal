@@ -1,6 +1,6 @@
 name:                machine-learning
 version:             0.1.0.0
-synopsis:            Machine learning algorithms.
+synopsis:            Composable machine learning algorithms.
 license:             MIT
 license-file:        LICENSE
 author:              Paweł Nowak
@@ -15,8 +15,8 @@ library
                        Data.ML.Model
                        Data.ML.Scalar
                        Data.ML.Matrix
-                       Data.ML.Monoid
-                       Data.ML.Linear
+                       Data.ML.MonoidHom
+                       Data.ML.LinearMap
                        Data.ML.Internal.Compose
                        Data.ML.Internal.Domain
                        Data.ML.Internal.Scalar
