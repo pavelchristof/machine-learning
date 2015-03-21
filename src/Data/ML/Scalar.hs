@@ -18,20 +18,29 @@ This module exports pure scalar functions as models.
 module Data.ML.Scalar (
     Scalar(..),
     Over(..),
+
+    -- * Exponential and logarithm.
     Exp(..),
-    Sqrt(..),
     Log(..),
+
+    -- * Trigonometric functions.
     Sin(..),
+    Tan(..),
     Cos(..),
     Asin(..),
     Atan(..),
     Acos(..),
+
+    -- * Hyperbolic functions.
     Sinh(..),
     Tanh(..),
     Cosh(..),
     Asinh(..),
     Atanh(..),
     Acosh(..),
+
+    -- * Other functions.
+    Sqrt(..),
     Sigmoid(..)
     ) where
 

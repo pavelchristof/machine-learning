@@ -36,6 +36,12 @@ class Functor f => Multiplicative f where
     one :: Num a => f a
     (^*^) :: Num a => f a -> f a -> f a
 
+instance Multiplicative Quaternion where
+    one = Quaternion 1 0
+    Quaternion s1 v1 ^*^ Quaternion s2 v2 = Quaternion
+        (s1*s2 - (v1 `dot` v2))
+        ((v1 `cross` v2) + s1*^v2 + s2*^v1)
+
 -- | A matrix with size known at compile time.
 newtype Matrix (rows :: Nat) (cols :: Nat) a
     = Matrix (V rows (V cols a))
