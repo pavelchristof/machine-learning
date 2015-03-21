@@ -1,5 +1,15 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE KindSignatures #-}
+{- |
+Module      :  Data.ML.Model
+Description :  Model class.
+Copyright   :  (c) Paweł Nowak
+License     :  MIT
+
+Maintainer  :  pawel834@gmail.com
+Stability   :  experimental
+
+-}
 module Data.ML.Model where
 
 import Control.Applicative
@@ -8,6 +18,7 @@ import Data.Monoid
 import Data.Traversable
 import Linear
 
+-- | A machine learning model.
 class (Traversable m, Additive m) => Model (m :: * -> *) where
     type Input m :: * -> *
     type Output m :: * -> *

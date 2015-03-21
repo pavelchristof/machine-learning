@@ -11,7 +11,7 @@ mpower x 1 = x
 mpower x n = mpower x r `mappend` mpower (x `mappend` x) q
   where (q, r) = quotRem n 2
 
--- | A semigroup used to fold a sparse enum domain.
+-- | A semigroup used to fold a sparse finite domain.
 data SparseFold m = SparseFold (Min Integer) m (Max Integer)
 
 instance (Given m, Monoid m) => Semigroup (SparseFold m) where

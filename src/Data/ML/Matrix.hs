@@ -2,6 +2,17 @@
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE KindSignatures #-}
+{- |
+Module      :  Data.ML.Matrix
+Description :  Matrices with size known at compile time.
+Copyright   :  (c) Paweł Nowak
+License     :  MIT
+
+Maintainer  :  pawel834@gmail.com
+Stability   :  experimental
+
+Provides matrices with size known at compile time and some useful wrappers.
+-}
 module Data.ML.Matrix where
 
 import Control.Applicative

@@ -5,7 +5,7 @@
 {-# LANGUAGE TypeFamilies #-}
 {- |
 Module      :  Data.ML.Domain
-Description :  Finite domains.
+Description :  Total maps.
 Copyright   :  (c) Paweł Nowak
 License     :  MIT
 
@@ -64,7 +64,6 @@ deriving instance FoldableWithKey (OrdDomain k)
 
 instance (Ord k, Enum k, Bounded k) => Additive (OrdDomain k) where
     zero = pure 0
-
 
 instance Traversable (OrdDomain k) where
     traverse f (OrdDomain m) = fmap OrdDomain (traverse f m)
