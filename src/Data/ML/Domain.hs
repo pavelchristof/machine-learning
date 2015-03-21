@@ -17,6 +17,7 @@ A domain in the sense of this module is actually a total map.
 module Data.ML.Domain where
 
 import           Control.Applicative
+import           Data.Bytes.Serial
 import           Data.Foldable
 import           Data.Key
 import           Data.ML.Internal.Domain
@@ -33,6 +34,7 @@ class ( Zip a
       , Adjustable a
       , Applicative a
       , Additive a
+      , Serial1 a
       ) => Domain a
 
 -- | Finite domain.
@@ -62,6 +64,12 @@ deriving instance Ord k => ZipWithKey (OrdDomain k)
 deriving instance Foldable (OrdDomain k)
 deriving instance FoldableWithKey (OrdDomain k)
 
+instance (Ord k, Serial k) => Serial1 (OrdDomain k) where
+    serializeWith f (OrdDomain m) =
+        serializeWith f m
+    deserializeWith f = OrdDomain
+        <$> deserializeWith f
+
 instance (Ord k, Enum k, Bounded k) => Additive (OrdDomain k) where
     zero = pure 0
 
@@ -75,9 +83,9 @@ instance (Ord k, Enum k, Bounded k) => Applicative (OrdDomain k) where
     pure x = OrdDomain $ Map.fromList [(k, x) | k <- [minBound .. maxBound]]
     (<*>) = zap
 
-instance (Ord k, Enum k, Bounded k) => Domain (OrdDomain k)
-instance (Ord k, Enum k, Bounded k) => FiniteDomain (OrdDomain k)
-instance (Ord k, Enum k, Bounded k) => DenseDomain (OrdDomain k)
+instance (Ord k, Enum k, Bounded k, Serial k) => Domain (OrdDomain k)
+instance (Ord k, Enum k, Bounded k, Serial k) => FiniteDomain (OrdDomain k)
+instance (Ord k, Enum k, Bounded k, Serial k) => DenseDomain (OrdDomain k)
 
 -- | Map for a sparse ordered domain implemented with a partial map
 -- and a fallback default value.
@@ -128,8 +136,16 @@ instance Ord k => Applicative (SparseOrdDomain k) where
 instance Ord k => Additive (SparseOrdDomain k) where
     zero = pure 0
 
-instance Ord k => Domain (SparseOrdDomain k)
-instance (Ord k, Enum k, Bounded k) => FiniteDomain (SparseOrdDomain k)
+instance (Ord k, Serial k) => Serial1 (SparseOrdDomain k) where
+    serializeWith f (SparseOrdDomain m d) =
+        serializeWith f m *>
+        f d
+    deserializeWith f = SparseOrdDomain
+        <$> deserializeWith f
+        <*> f
+
+instance (Ord k, Serial k) => Domain (SparseOrdDomain k)
+instance (Ord k, Enum k, Bounded k, Serial k) => FiniteDomain (SparseOrdDomain k)
 
 -- | Converts a sparse domain to a dense domain.
 toDense :: Ord k => Enum k => Bounded k

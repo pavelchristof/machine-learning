@@ -1,3 +1,7 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE DeriveFoldable #-}
+{-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE KindSignatures #-}
 {- |
@@ -13,16 +17,30 @@ Stability   :  experimental
 module Data.ML.Model where
 
 import Control.Applicative
+import Data.Bytes.Serial
 import Data.Foldable
 import Data.Monoid
 import Data.Traversable
 import Linear
 
 -- | A machine learning model.
-class (Traversable m, Additive m) => Model (m :: * -> *) where
+class (Traversable m, Additive m, Serial1 m) => Model m where
     type Input m :: * -> *
     type Output m :: * -> *
     predict :: Floating a => Input m a -> m a -> Output m a
+
+-- | A model that passes through its input.
+newtype IdentityModel (f :: * -> *) (a :: *) = IdentityModel (V0 a)
+     deriving (Functor, Applicative, Monad, Foldable, Traversable, Additive)
+
+instance Serial1 (IdentityModel f) where
+    serializeWith _ _ = return ()
+    deserializeWith _ = return (IdentityModel V0)
+
+instance Model (IdentityModel f) where
+    type Input (IdentityModel f) = f
+    type Output (IdentityModel f) = f
+    predict x _ = x
 
 -- | A composition of models.
 data CompositeModel f g a = CompositeModel (f a) (g a)
@@ -50,6 +68,14 @@ instance (Traversable f, Traversable g) => Traversable (CompositeModel f g) wher
     traverse h (CompositeModel f g) = CompositeModel
         <$> traverse h f
         <*> traverse h g
+
+instance (Serial1 f, Serial1 g) => Serial1 (CompositeModel f g) where
+    serializeWith h (CompositeModel f g) =
+        serializeWith h f *>
+        serializeWith h g
+    deserializeWith h = CompositeModel
+        <$> deserializeWith h
+        <*> deserializeWith h
 
 instance (Model f, Model g, Output f ~ Input g) => Model (CompositeModel f g) where
     type Input (CompositeModel f g) = Input f

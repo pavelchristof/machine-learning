@@ -16,6 +16,7 @@ Provides matrices with size known at compile time and some useful wrappers.
 module Data.ML.Matrix where
 
 import Control.Applicative
+import Data.Bytes.Serial
 import Data.Foldable
 import Data.Monoid
 import Data.Traversable
@@ -55,6 +56,10 @@ instance (KnownNat rows, KnownNat cols) => Foldable (MatrixLV rows cols) where
 instance (KnownNat rows, KnownNat cols) => Traversable (MatrixLV rows cols) where
     traverse f (MatrixLV m) = MatrixLV
         <$> traverse (traverse f) m
+
+instance (KnownNat rows, KnownNat cols) => Serial1 (MatrixLV rows cols) where
+    serializeWith f (MatrixLV m) = serializeWith (serializeWith f) m
+    deserializeWith f = MatrixLV <$> deserializeWith (deserializeWith f)
 
 instance (KnownNat rows, KnownNat cols) => Additive (MatrixLV rows cols) where
     zero = MatrixLV zero

@@ -19,6 +19,7 @@ Stability   :  experimental
 module Data.ML.Monoid.MatrixProd where
 
 import Control.Applicative
+import Data.Bytes.Serial
 import Data.Foldable
 import Data.Key
 import Data.ML.Domain
@@ -48,6 +49,10 @@ instance (Additive dom, KnownNat size) => Additive (MatrixProdModel dom size) wh
         MatrixProdModel (liftU2 (liftU2 h) m m')
     liftI2 h (MatrixProdModel m) (MatrixProdModel m') =
         MatrixProdModel (liftI2 (liftI2 h) m m')
+
+instance (Serial1 dom, KnownNat size) => Serial1 (MatrixProdModel dom size) where
+    serializeWith f (MatrixProdModel m) = serializeWith (serializeWith f) m
+    deserializeWith f = MatrixProdModel <$> deserializeWith (deserializeWith f)
 
 instance (DenseDomain dom, KnownNat size) => Model (MatrixProdModel dom size) where
     type Input (MatrixProdModel dom size) = FreeMonoid (Key dom)
