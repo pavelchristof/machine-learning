@@ -30,7 +30,7 @@ import Prelude hiding (sum)
 -- | A cost function for model m is a function taking  the actual
 -- output, the expected output, the model and returning a scalar cost.
 newtype Cost m = Cost
-    { getCost :: forall f a. Foldable f => Floating a => Show a
+    { getCost :: forall f a. Foldable f => Floating a
               => f (Output m a, Output m a) -> m a -> a }
 
 liftCost :: (forall a. Floating a => a -> a) -> Cost m -> Cost m
@@ -90,7 +90,7 @@ instance Num a => Monoid (Mean a) where
 logistic :: Applicative (Output m) => Foldable (Output m) => Cost m
 logistic = Cost (\s _ -> - getMean (foldMap (foldMap mean . uncurry (liftA2 j)) s))
   where
-    j actual expected = Debug.Trace.traceShow actual $ expected * log (actual + epsilon)
+    j actual expected = expected * log (actual + epsilon)
                       + (1 - expected) * log (1 - actual + epsilon)
     epsilon :: Floating a => a
     epsilon = 1e-6

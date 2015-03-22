@@ -34,11 +34,14 @@ cost = logistic + 0.01 * l2reg
 evenCount :: Char -> [Char] -> Bool
 evenCount x xs = length (elemIndices x xs) `rem` 2 == 0
 
+isAccepted :: String -> Bool
+isAccepted s = evenCount 'a' s && evenCount 'b' s
+
+
+
 dataset :: Floating a => [(FreeMonoid Letter a, Scalar a)]
 dataset = map (bimap (toFreeMonoid . map Letter) Scalar)
-        $ map (\s -> (s, if evenCount 'a' s && evenCount 'b' s
-                            then 1
-                            else 0))
+        $ map (\s -> (s, if isAccepted s then 1 else 0))
         $ [1 .. 5] >>= flip replicateM ['a', 'b']
 
 repl :: Floating a => Show a => ExampleModel a -> InputT IO ()
@@ -51,47 +54,18 @@ repl model = do
         outputStrLn (show result)
         repl model
 
-main2 :: IO ()
-main2 = do
-    let s = ["3.2910313625311662",
-            "-3.720233656325635",
-            "1.7e-322",
-            "-1.2138356404396925e-6",
-            "-3.323441165146289e-5",
-            "-3.937484289013896e-6",
-            "-2.7903723900230495e-13",
-            "-9.929445010038518e-32",
-            "-8.615456026547715e-24",
-            "1.7268739964134595e-26",
-            "-8.725096901710127e-3",
-            "7.638015308304665e-14",
-            "-5.099212878516502e-42",
-            "5.8216023355334485e-5",
-            "-3.5942599108900903e-7",
-            "-1.555149636884462e-27",
-            "-3.96299773824206e-6",
-            "-4.967146520776881e-19",
-            "-1.2023355746871941e-14",
-            "-9.226291844483162e-4",
-            "2.1642570295673594e-40",
-            "-1.1101779414799364e-2",
-            "-1.3279381813507682e-20",
-            "6.0898687604799085e-192",
-            "1.3089885372040525e-4",
-            "-6.019190858680441e-11"]
-    let cs :: [Double]
-        cs = map read s
-    let model :: ExampleModel Double
-        model = evalState (traverse (\_ -> state (\(x:xs) -> (x, xs))) (pure ())) cs
-    forM_ dataset $ \(i, o) -> do
-         print ((\(FreeMonoid m) -> m) i (\(Letter c) -> c:[]))
-         print (getScalar $ predict i model)
-         print (getCost cost (Identity (predict i model, o)) model)
+check :: ExampleModel Double -> Int
+check model = length $ map (\(i, o) -> abs (getScalar (predict i model) - getScalar o) <= 0.5) dataset
 
 main :: IO ()
 main = do
     model <- sample $ generate (normal 0 (1 :: Double))
-    batches <- sample $ replicateM 10000 $ randomElement (map Identity dataset)
+    --batches <- sample $ replicateM 10000 $ randomElement (map Identity dataset)
+    let batches = replicate 5000 dataset
     let iters = adaGrad batches cost model
     mapM_ print (map fst iters)
-    runInputT defaultSettings $ repl (snd (last iters))
+    let model' = snd (last iters)
+        correct = check model'
+        total = length dataset
+    putStrLn $ show correct ++ "/" ++ show total ++ " correct"
+    runInputT defaultSettings $ repl model'
