@@ -40,6 +40,7 @@ module Data.ML.Scalar (
     Acosh(..),
 
     -- * Other functions.
+    Id(..),
     Sqrt(..),
     Sigmoid(..)
     ) where
@@ -89,6 +90,8 @@ mkPureModel [| cosh |] "Cosh"
 mkPureModel [| asinh |] "Asinh"
 mkPureModel [| atanh |] "Atanh"
 mkPureModel [| acosh |] "Acosh"
+
+mkPureModel [| id |] "Id"
 
 sigmoid :: Floating f => f -> f
 sigmoid x = 1 / (1 + exp (-x))

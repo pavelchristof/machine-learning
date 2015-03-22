@@ -33,19 +33,6 @@ class Model m where
 generate :: (Applicative f, Applicative g, Traversable g) => f a -> f (g a)
 generate f = traverse (const f) (pure ())
 
--- | A model that passes through its input.
-newtype IdentityModel (f :: * -> *) (a :: *) = IdentityModel (V0 a)
-     deriving (Functor, Applicative, Monad, Foldable, Traversable, Additive, Metric)
-
-instance Serial1 (IdentityModel f) where
-    serializeWith _ _ = return ()
-    deserializeWith _ = return (IdentityModel V0)
-
-instance Model (IdentityModel f) where
-    type Input (IdentityModel f) = f
-    type Output (IdentityModel f) = f
-    predict x _ = x
-
 -- | A composition of models.
 data (f :>> g) a = (f a) :>> (g a)
 
