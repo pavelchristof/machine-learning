@@ -19,8 +19,8 @@ type ExampleModel
     = MonoidHom (OrdDomain Letter) (Matrix' 5)
   :>> AffineMap (Matrix' 5) (V 10)
   :>> Over (V 10) Sigmoid
-  :>> AffineMap (V 10) Scalar
-  :>> Sigmoid
+  :>> AffineMap (V 10) (V 2)
+  :>> Softmax (V 2)
 
 predict' :: Floating a => String -> ExampleModel a -> a
 predict' word = getScalar . predict (toFreeMonoid (fmap Letter word))

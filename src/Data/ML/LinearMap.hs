@@ -3,8 +3,6 @@
 {-# LANGUAGE DeriveFoldable #-}
 {-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE KindSignatures #-}
 {- |
 Module      :  Data.ML.LinearMap
 Description :  Linear map model.

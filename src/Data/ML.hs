@@ -5,6 +5,7 @@ module Data.ML (
     module Data.ML.MonoidHom,
     module Data.ML.LinearMap,
     module Data.ML.AffineMap,
+    module Data.ML.Softmax,
     module Data.ML.Scalar,
     module Linear,
     module Linear.V,
@@ -17,6 +18,7 @@ import Data.ML.AffineMap
 import Data.ML.Matrix
 import Data.ML.Model
 import Data.ML.MonoidHom
+import Data.ML.Softmax
 import Data.ML.Scalar
 import Linear
 import Linear.V

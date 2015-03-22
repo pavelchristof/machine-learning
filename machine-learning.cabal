@@ -14,6 +14,7 @@ library
                        Data.ML.Domain
                        Data.ML.Model
                        Data.ML.Scalar
+                       Data.ML.Softmax
                        Data.ML.Matrix
                        Data.ML.MonoidHom
                        Data.ML.LinearMap
