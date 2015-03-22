@@ -19,8 +19,8 @@ import Data.Traversable
 import Language.Haskell.TH
 import Linear
 
-mkPureModel :: ExpQ -> String -> Q [Dec]
-mkPureModel f name' = do
+mkScalarModel :: ExpQ -> String -> Q [Dec]
+mkScalarModel f name' = do
    let name = mkName name'
        a = mkName "a"
    v0 <- [t|V0 $(varT a)|]

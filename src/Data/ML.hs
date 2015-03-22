@@ -8,6 +8,7 @@ module Data.ML (
     module Data.ML.Softmax,
     module Data.ML.Scalar,
     module Data.ML.Cost,
+    module Data.ML.Search,
     module Linear,
     module Linear.V,
     module Numeric.AD
@@ -22,6 +23,7 @@ import Data.ML.MonoidHom
 import Data.ML.Softmax
 import Data.ML.Scalar
 import Data.ML.Cost
+import Data.ML.Search
 import Linear
 import Linear.V
 import Numeric.AD hiding (Scalar)

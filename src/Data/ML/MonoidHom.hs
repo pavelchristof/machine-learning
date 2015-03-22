@@ -33,12 +33,28 @@ import Linear
 -- the kind of model input.
 newtype FreeMonoid a b = FreeMonoid (forall m. Monoid m => (a -> m) -> m)
 
+instance Functor (FreeMonoid a) where
+    fmap _ (FreeMonoid m) = FreeMonoid m
+
+instance Monoid (FreeMonoid a b) where
+    mempty = FreeMonoid (const mempty)
+    FreeMonoid f `mappend` FreeMonoid g = FreeMonoid $ \m -> f m <> g m
+
+instance Applicative (FreeMonoid a) where
+    pure _ = mempty
+    FreeMonoid f <*> FreeMonoid x = FreeMonoid $ \m -> f m <> x m
+
+instance Foldable (FreeMonoid a) where
+    foldMap _ _ = mempty
+
+instance Traversable (FreeMonoid a) where
+    traverse _ (FreeMonoid m) = pure (FreeMonoid m)
+
 toFreeMonoid :: Foldable f => f a -> FreeMonoid a b
 toFreeMonoid x = FreeMonoid (\f -> foldMap f x)
 
 -- | A homomorphism from the free monoid over the given domain to a multiplicative monoid @m a@.
-newtype MonoidHom dom m a
-    = MonoidHom (Compose dom m a)
+newtype MonoidHom dom m a = MonoidHom (Compose dom m a)
     deriving (Show, Functor, Applicative, Foldable, Traversable, Additive, Metric)
 
 instance (Serial1 dom, Serial1 m) => Serial1 (MonoidHom dom m) where

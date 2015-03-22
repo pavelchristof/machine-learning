@@ -70,29 +70,29 @@ instance (Applicative f, Model m, Input m ~ Scalar, Output m ~ Scalar)
     predict x (Over (Compose m)) = predict' <$> x <*> m
       where predict' x' m' = getScalar (predict (Scalar x') m')
 
-mkPureModel [| exp |] "Exp"
-mkPureModel [| sqrt |] "Sqrt"
-mkPureModel [| log |] "Log"
+mkScalarModel [| exp |] "Exp"
+mkScalarModel [| sqrt |] "Sqrt"
+mkScalarModel [| log |] "Log"
 
-mkPureModel [| sin |] "Sin"
-mkPureModel [| tan |] "Tan"
-mkPureModel [| cos |] "Cos"
+mkScalarModel [| sin |] "Sin"
+mkScalarModel [| tan |] "Tan"
+mkScalarModel [| cos |] "Cos"
 
-mkPureModel [| asin |] "Asin"
-mkPureModel [| atan |] "Atan"
-mkPureModel [| acos |] "Acos"
+mkScalarModel [| asin |] "Asin"
+mkScalarModel [| atan |] "Atan"
+mkScalarModel [| acos |] "Acos"
 
-mkPureModel [| sinh |] "Sinh"
-mkPureModel [| tanh |] "Tanh"
-mkPureModel [| cosh |] "Cosh"
+mkScalarModel [| sinh |] "Sinh"
+mkScalarModel [| tanh |] "Tanh"
+mkScalarModel [| cosh |] "Cosh"
 
-mkPureModel [| asinh |] "Asinh"
-mkPureModel [| atanh |] "Atanh"
-mkPureModel [| acosh |] "Acosh"
+mkScalarModel [| asinh |] "Asinh"
+mkScalarModel [| atanh |] "Atanh"
+mkScalarModel [| acosh |] "Acosh"
 
-mkPureModel [| id |] "Id"
+mkScalarModel [| id |] "Id"
 
 sigmoid :: Floating f => f -> f
 sigmoid x = 1 / (1 + exp (-x))
 
-mkPureModel [| sigmoid |] "Sigmoid"
+mkScalarModel [| sigmoid |] "Sigmoid"
