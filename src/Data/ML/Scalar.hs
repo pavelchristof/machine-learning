@@ -48,7 +48,6 @@ module Data.ML.Scalar (
 import Control.Applicative
 import Data.Bytes.Serial
 import Data.Foldable
-import Data.Functor.Identity
 import Data.ML.Internal.Compose
 import Data.ML.Internal.Scalar
 import Data.ML.Internal.TH

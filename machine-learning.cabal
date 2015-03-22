@@ -17,7 +17,9 @@ library
                        Data.ML.Matrix
                        Data.ML.MonoidHom
                        Data.ML.LinearMap
+                       Data.ML.AffineMap
                        Data.ML.Internal.Compose
+                       Data.ML.Internal.Product
                        Data.ML.Internal.Domain
                        Data.ML.Internal.Scalar
                        Data.ML.Internal.TH

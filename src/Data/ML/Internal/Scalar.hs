@@ -12,8 +12,11 @@ Stability   :  experimental
 module Data.ML.Internal.Scalar where
 
 import Control.Applicative
+import Data.Bytes.Serial
 import Data.Foldable
+import Data.ML.Matrix
 import Data.Traversable
+import Linear
 
 -- | A scalar value, aka identity functor.
 newtype Scalar a = Scalar { getScalar :: a }
@@ -26,3 +29,19 @@ instance Applicative Scalar where
 instance Monad Scalar where
     return a = Scalar a
     m >>= k  = k (getScalar m)
+
+instance Additive Scalar where
+    zero = pure 0
+    liftU2 = liftA2
+    liftI2 = liftA2
+
+instance Metric Scalar where
+    dot (Scalar a) (Scalar b) = a * b
+
+instance Multiplicative Scalar where
+    one = pure 1
+    (^*^) = liftA2 (*)
+
+instance Serial1 Scalar where
+    serializeWith f (Scalar x) = f x
+    deserializeWith f = Scalar <$> f

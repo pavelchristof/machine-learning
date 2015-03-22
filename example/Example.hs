@@ -17,9 +17,9 @@ instance Bounded Letter where
 
 type ExampleModel
     = MonoidHom (OrdDomain Letter) (Matrix' 5)
-  :>> LinearMap (Matrix' 5) (V 10)
+  :>> AffineMap (Matrix' 5) (V 10)
   :>> Over (V 10) Sigmoid
-  :>> LinearMap (V 10) Scalar
+  :>> AffineMap (V 10) Scalar
   :>> Sigmoid
 
 predict' :: Floating a => String -> ExampleModel a -> a

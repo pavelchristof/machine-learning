@@ -26,7 +26,7 @@ import Linear
 
 -- | A linear map.
 newtype LinearMap f g a = LinearMap (Compose g f a)
-    deriving (Show, Functor, Applicative, Foldable, Traversable, Additive, Metric)
+    deriving (Functor, Applicative, Foldable, Traversable, Additive, Metric)
 
 instance (Serial1 f, Serial1 g) => Serial1 (LinearMap f g) where
     serializeWith f (LinearMap m) = serializeWith f m
