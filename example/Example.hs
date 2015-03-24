@@ -38,8 +38,8 @@ isAccepted :: String -> Bool
 isAccepted s = evenCount 'a' s && evenCount 'b' s
 
 
-dataset :: Floating a => [(FreeMonoid Letter a, Scalar a)]
-dataset = map (bimap (toFreeMonoid . map Letter) Scalar)
+dataset :: Floating a => [(Const [Letter] a, Scalar a)]
+dataset = map (bimap (Const . map Letter) Scalar)
         $ map (\s -> (s, if isAccepted s then 1 else 0))
         $ [0 .. 6] >>= flip replicateM ['a', 'b']
 
@@ -49,11 +49,11 @@ repl model = do
     case input of
       Nothing -> return ()
       Just line -> do
-        let result = getScalar $ predict (toFreeMonoid $ map Letter line) model
+        let result = getScalar $ predict (Const $ map Letter line) model
         outputStrLn (show result)
         repl model
 
-check :: ExampleModel Double -> [(FreeMonoid Letter Double, Scalar Double)] -> Int
+check :: ExampleModel Double -> [(Const [Letter] Double, Scalar Double)] -> Int
 check model set = length $ map (\(i, o) -> abs (getScalar (predict i model) - getScalar o) <= 0.5) set
 
 main :: IO ()
