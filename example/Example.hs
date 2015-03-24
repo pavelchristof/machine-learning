@@ -54,7 +54,7 @@ repl model = do
         repl model
 
 check :: ExampleModel Double -> [(Const [Letter] Double, Scalar Double)] -> Int
-check model set = length $ map (\(i, o) -> abs (getScalar (predict i model) - getScalar o) <= 0.5) set
+check model set = length $ map (\(i, o) -> abs (predict i model - o) <= 0.5) set
 
 main :: IO ()
 main = do

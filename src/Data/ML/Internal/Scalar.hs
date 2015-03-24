@@ -1,3 +1,4 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE DeriveFoldable #-}
 {-# LANGUAGE DeriveTraversable #-}
 {-# LANGUAGE DeriveFunctor #-}
@@ -20,7 +21,7 @@ import Linear
 
 -- | A scalar value, aka identity functor.
 newtype Scalar a = Scalar { getScalar :: a }
-    deriving (Functor, Foldable, Traversable)
+    deriving (Functor, Foldable, Traversable, Eq, Ord, Num, Fractional, Floating)
 
 instance Applicative Scalar where
     pure a = Scalar a
