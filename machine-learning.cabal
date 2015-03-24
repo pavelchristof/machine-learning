@@ -19,6 +19,7 @@ library
                        Data.ML.MonoidHom
                        Data.ML.LinearMap
                        Data.ML.AffineMap
+                       Data.ML.Cata
                        Data.ML.Cost
                        Data.ML.Search
                        Data.ML.Internal.Compose

@@ -6,6 +6,7 @@ module Data.ML (
     module Data.ML.LinearMap,
     module Data.ML.AffineMap,
     module Data.ML.Softmax,
+    module Data.ML.Cata,
     module Data.ML.Scalar,
     module Data.ML.Cost,
     module Data.ML.Search,
@@ -22,6 +23,7 @@ import Data.ML.Model
 import Data.ML.MonoidHom
 import Data.ML.Softmax
 import Data.ML.Scalar
+import Data.ML.Cata
 import Data.ML.Cost
 import Data.ML.Search
 import Linear
