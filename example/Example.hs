@@ -38,11 +38,10 @@ isAccepted :: String -> Bool
 isAccepted s = evenCount 'a' s && evenCount 'b' s
 
 
-
 dataset :: Floating a => [(FreeMonoid Letter a, Scalar a)]
 dataset = map (bimap (toFreeMonoid . map Letter) Scalar)
         $ map (\s -> (s, if isAccepted s then 1 else 0))
-        $ [1 .. 5] >>= flip replicateM ['a', 'b']
+        $ [0 .. 6] >>= flip replicateM ['a', 'b']
 
 repl :: Floating a => Show a => ExampleModel a -> InputT IO ()
 repl model = do
@@ -54,18 +53,27 @@ repl model = do
         outputStrLn (show result)
         repl model
 
-check :: ExampleModel Double -> Int
-check model = length $ map (\(i, o) -> abs (getScalar (predict i model) - getScalar o) <= 0.5) dataset
+check :: ExampleModel Double -> [(FreeMonoid Letter Double, Scalar Double)] -> Int
+check model set = length $ map (\(i, o) -> abs (getScalar (predict i model) - getScalar o) <= 0.5) set
 
 main :: IO ()
 main = do
+    -- Prepare data sets.
+    dataset' <- sample $ shuffle dataset
+    let split = floor $ 0.6 * fromIntegral (length dataset')
+        trainingSet = take split dataset'
+        validationSet = drop split dataset'
+
+    -- Teach the model.
     model <- sample $ generate (normal 0 (1 :: Double))
-    --batches <- sample $ replicateM 10000 $ randomElement (map Identity dataset)
-    let batches = replicate 5000 dataset
+    let batches = replicate 200 trainingSet
     let iters = adaGrad batches cost model
     mapM_ print (map fst iters)
     let model' = snd (last iters)
-        correct = check model'
-        total = length dataset
-    putStrLn $ show correct ++ "/" ++ show total ++ " correct"
+
+    -- Evaluate the model.
+    putStrLn $ show (check model' trainingSet) ++ "/" ++ show (length trainingSet)
+             ++ " correct on training set"
+    putStrLn $ show (check model' validationSet) ++ "/" ++ show (length validationSet)
+             ++ " correct on validation set"
     runInputT defaultSettings $ repl model'
