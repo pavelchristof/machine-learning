@@ -10,6 +10,7 @@ Stability   :  experimental
 -}
 module Data.ML.Cost (
     Cost(..),
+    costWithGrad,
 
     -- | Classifictation.
     logistic,
@@ -20,11 +21,14 @@ module Data.ML.Cost (
     ) where
 
 import Control.Applicative
+import Data.Bifunctor
 import Data.Foldable
 import Data.ML.Model
 import Data.Monoid
+import Data.Traversable
 import Debug.Trace
 import Linear
+import Numeric.AD
 import Prelude hiding (sum)
 
 -- | A cost function for model m is a function taking  the actual
@@ -72,6 +76,18 @@ instance Floating (Cost m) where
     asinh = liftCost asinh
     atanh = liftCost atanh
     acosh = liftCost acosh
+
+-- | Computes the cost function with its gradient.
+costWithGrad :: Floating a
+             => Model m => Traversable m
+             => Foldable f => Functor f
+             => Functor (Output m) => Functor (Input m)
+             => Cost m
+             -> f (Input m a, Output m a)
+             -> m a
+             -> (a, m a)
+costWithGrad (Cost c) batch = grad' $ \model ->
+    c (fmap (first (`predict` model) . bimap (fmap auto) (fmap auto)) batch) model
 
 -- TODO: research monoidal means
 data Mean a = Mean a Int
