@@ -22,6 +22,8 @@ library
                        Data.ML.Cata
                        Data.ML.Cost
                        Data.ML.Search
+                       Data.ML.Repl
+                       Data.ML.Repl.Commands
                        Data.ML.Internal.Compose
                        Data.ML.Internal.Product
                        Data.ML.Internal.Domain
@@ -31,9 +33,12 @@ library
                        TypeOperators
   build-depends:       base <5, linear >= 1.18 && <2, containers >= 0.5 && <1,
                        ad == 4.*, keys == 3.*, reflection == 1.*, bifunctors == 4.*,
-                       semigroups == 0.*, transformers == 0.*,
-                       semigroupoids == 4.*, bytes >= 0.11 && <1,
-                       template-haskell, random-fu, haskeline
+                       semigroups == 0.*, transformers == 0.*, mtl == 2.*,
+                       semigroupoids == 4.*, bytes >= 0.11 && <1, exceptions >= 0.8,
+                       hint >= 0.4, haskeline >= 0.7,
+                       lifted-base >= 0.2, transformers-base >= 0.4,
+                       random-fu >= 0.2,
+                       template-haskell
   hs-source-dirs:      src
   default-language:    Haskell2010
 

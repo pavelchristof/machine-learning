@@ -23,8 +23,9 @@ import Data.Traversable
 import Linear
 
 -- | Adaptive gradient descent working on batches.
-adaGrad :: forall f m a. Show a => Model m => Additive m => Traversable m => RealFloat a
-        => Foldable f => Functor f => Functor (Output m) => Functor (Input m)
+adaGrad :: RealFloat a
+        => Model m => Additive m => Traversable m
+        => Foldable f => Functor f
         => [f (Input m a, Output m a)] -- ^ List of mini batches
         -> Cost m                      -- ^ The cost function.
         -> m a                         -- ^ Starting point.
@@ -33,12 +34,9 @@ adaGrad i cost m0 = tail $ fmap (\(j, m, _, _) -> (j, m))
                   $ scanl step (0, m0, m0, zero) i
   where
     -- (prevCost, prevModel, model, historicalGrad)
-    step :: (a, m a, m a, m a)
-         -> f (Input m a, Output m a)
-         -> (a, m a, m a, m a)
     step (_, _, model, historicalGrad) batch =
       let -- Compute the gradient on this batch.
-          (j, g) = costWithGrad cost batch model
+          (j, g) = evalCostGrad cost batch model
 
           -- Update the accumulated gradient.
           historicalGrad' = historicalGrad ^+^ liftU2 (*) g g

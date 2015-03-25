@@ -10,7 +10,8 @@ Stability   :  experimental
 -}
 module Data.ML.Cost (
     Cost(..),
-    costWithGrad,
+    evalCost,
+    evalCostGrad,
 
     -- | Classifictation.
     logistic,
@@ -30,6 +31,7 @@ import Debug.Trace
 import Linear
 import Numeric.AD
 import Prelude hiding (sum)
+import System.IO.Unsafe
 
 -- | A cost function for model m is a function taking  the actual
 -- output, the expected output, the model and returning a scalar cost.
@@ -77,19 +79,34 @@ instance Floating (Cost m) where
     atanh = liftCost atanh
     acosh = liftCost acosh
 
+-- | Computes the cost function.
+evalCost :: Floating a => Model m
+         => Foldable f => Functor f
+         => Cost m
+         -> f (Input m a, Output m a)
+         -> m a
+         -> a
+evalCost (Cost cost) batch model = cost
+    (fmap (first (`predict` model)) batch)
+    model
+
 -- | Computes the cost function with its gradient.
-costWithGrad :: Floating a
+--
+-- Replaces all NaNs in the gradient with zeros.
+evalCostGrad :: RealFloat a
              => Model m => Traversable m
              => Foldable f => Functor f
-             => Functor (Output m) => Functor (Input m)
              => Cost m
              -> f (Input m a, Output m a)
              -> m a
              -> (a, m a)
-costWithGrad (Cost c) batch = grad' $ \model ->
-    c (fmap (first (`predict` model) . bimap (fmap auto) (fmap auto)) batch) model
+evalCostGrad cost batch model = (j, fmap deNaN g)
+  where
+    (j, g) = grad' (evalCost cost (fmap (bimap (fmap auto) (fmap auto)) batch))
+                   model
+    deNaN x | isNaN x = 0
+            | otherwise = x
 
--- TODO: research monoidal means
 data Mean a = Mean a Int
 
 mean :: a -> Mean a

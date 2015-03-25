@@ -25,7 +25,7 @@ import Data.Traversable
 import Linear
 
 -- | A machine learning model.
-class Model m where
+class (Functor (Input m), Functor (Output m)) => Model m where
     type Input m :: * -> *
     type Output m :: * -> *
     predict :: Floating a => Input m a -> m a -> Output m a
