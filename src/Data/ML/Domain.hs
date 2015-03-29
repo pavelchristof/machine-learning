@@ -16,15 +16,12 @@ A domain in the sense of this module is actually a total map.
 -}
 module Data.ML.Domain where
 
-import           Control.Applicative
 import           Data.Bytes.Serial
-import           Data.Foldable
 import           Data.Key
 import           Data.ML.Internal.Domain
 import           Data.Map (Map)
 import qualified Data.Map as Map
 import           Data.Monoid
-import           Data.Traversable
 import           Linear
 import           Prelude hiding (zip, lookup)
 
@@ -127,8 +124,8 @@ instance Ord k => Zip (SparseOrdDomain k) where
         (d1, d2)
 
 instance (Ord k, Enum k, Bounded k) => Foldable (SparseOrdDomain k) where
-    foldMap f (SparseOrdDomain m d) = runSparseFold (f d)
-         $ foldPoint (toInteger (fromEnum (minBound :: k)) - 1) mempty
+    foldMap f (SparseOrdDomain m d) = runSparseFold (f d) $ \_ ->
+           foldPoint (toInteger (fromEnum (minBound :: k)) - 1) mempty
         <> Map.foldMapWithKey (\k v -> foldPoint (toInteger (fromEnum k)) (f v)) m
         <> foldPoint (toInteger (fromEnum (maxBound :: k)) + 1) mempty
 
