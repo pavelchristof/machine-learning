@@ -53,11 +53,9 @@ repl = do
       Nothing -> return ()
       Just line -> do
         result <- catch
-            (Right <$> interpret line infer)
+            (Right <$> interpret line (as :: m ()))
             (return . Left)
-        case result of
-            Left err -> liftIO $ putStrLn $ formatError err
-            Right (m :: m ()) -> lift m
+        either (liftIO . putStrLn . formatError) lift result
         repl
 
 formatError :: InterpreterError -> String
