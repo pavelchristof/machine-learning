@@ -20,13 +20,10 @@ module Data.ML.MonoidHom where
 
 import Control.Applicative
 import Data.Bytes.Serial
-import Data.Foldable
 import Data.Key
 import Data.ML.Internal.Compose
 import Data.ML.Matrix
 import Data.ML.Model
-import Data.Monoid
-import Data.Traversable
 import Linear
 
 -- | A homomorphism from the free monoid over the given domain to

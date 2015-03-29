@@ -14,14 +14,12 @@ module Data.ML.Internal.Scalar where
 
 import Control.Applicative
 import Data.Bytes.Serial
-import Data.Foldable
 import Data.ML.Matrix
-import Data.Traversable
 import Linear
 
 -- | A scalar value, aka identity functor.
 newtype Scalar a = Scalar { getScalar :: a }
-    deriving (Functor, Foldable, Traversable, Eq, Ord, Num, Fractional, Floating)
+    deriving (Show, Functor, Foldable, Traversable, Eq, Ord, Num, Fractional, Floating)
 
 instance Applicative Scalar where
     pure a = Scalar a

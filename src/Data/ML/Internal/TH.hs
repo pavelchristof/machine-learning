@@ -9,13 +9,9 @@ Stability   :  experimental
 -}
 module Data.ML.Internal.TH where
 
-import Control.Applicative
 import Data.Bytes.Serial
-import Data.Coerce
-import Data.Foldable
 import Data.ML.Internal.Scalar
 import Data.ML.Model
-import Data.Traversable
 import Language.Haskell.TH
 import Linear
 

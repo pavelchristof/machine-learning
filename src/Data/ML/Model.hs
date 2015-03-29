@@ -3,7 +3,7 @@
 {-# LANGUAGE DeriveFoldable #-}
 {-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE RankNTypes #-}
 {- |
 Module      :  Data.ML.Model
 Description :  Model class.
@@ -16,12 +16,9 @@ Stability   :  experimental
 -}
 module Data.ML.Model where
 
-import Control.Applicative
 import Data.Bytes.Serial
-import Data.Foldable
 import Data.ML.Internal.Product
-import Data.Monoid hiding (Product)
-import Data.Traversable
+import Data.Vector
 import Linear
 
 -- | A machine learning model.
@@ -29,6 +26,9 @@ class (Functor (Input m), Functor (Output m)) => Model m where
     type Input m :: * -> *
     type Output m :: * -> *
     predict :: Floating a => Input m a -> m a -> Output m a
+
+-- | A data set is a vector of (input, output) pairs.
+type DataSet m a = Vector (Input m a, Output m a)
 
 -- | Generates a model with an applicative.
 generate :: (Applicative f, Applicative g, Traversable g) => f a -> f (g a)

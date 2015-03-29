@@ -14,12 +14,9 @@ Stability   :  experimental
 -}
 module Data.ML.LinearMap where
 
-import Control.Applicative
 import Data.Bytes.Serial
-import Data.Foldable
 import Data.ML.Internal.Compose
 import Data.ML.Model
-import Data.Traversable
 import Linear
 
 -- | A linear map.

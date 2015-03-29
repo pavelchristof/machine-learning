@@ -22,29 +22,35 @@ library
                        Data.ML.Cata
                        Data.ML.Cost
                        Data.ML.Search
+                       Data.ML.Driver
                        Data.ML.Repl
-                       Data.ML.Repl.Commands
                        Data.ML.Internal.Compose
                        Data.ML.Internal.Product
                        Data.ML.Internal.Domain
                        Data.ML.Internal.Scalar
+                       Data.ML.Internal.Driver
+                       Data.ML.Internal.Repl
                        Data.ML.Internal.TH
   default-extensions:  FlexibleContexts, FlexibleInstances, ScopedTypeVariables,
-                       TypeOperators
-  build-depends:       base <5, linear >= 1.18 && <2, containers >= 0.5 && <1,
-                       ad == 4.*, keys == 3.*, reflection == 1.*, bifunctors == 4.*,
-                       semigroups == 0.*, transformers == 0.*, mtl == 2.*,
-                       semigroupoids == 4.*, bytes >= 0.11 && <1, exceptions >= 0.8,
-                       hint >= 0.4, haskeline >= 0.7,
-                       lifted-base >= 0.2, transformers-base >= 0.4,
-                       random-fu >= 0.2,
+                       TypeOperators, AutoDeriveTypeable
+  build-depends:       base <5,
+                       linear >= 1.18 && <2, ad == 4.*,
+                       containers >= 0.5 && <1, keys == 3.*, vector,
+                       reflection == 1.*, bifunctors == 4.*,
+                       semigroups == 0.*, semigroupoids == 4.*,
+                       transformers == 0.*, mtl == 2.*,
+                       transformers-base >= 0.4, exceptions >= 0.8,
+                       bytes >= 0.11 && <1,
+                       hint >= 0.4.2.2, haskeline >= 0.7,
+                       random-fu >= 0.2, rvar >= 0.2,
                        template-haskell
   hs-source-dirs:      src
   default-language:    Haskell2010
+  ghc-options:         -W
 
 executable example
   main-is:             Example.hs
   hs-source-dirs:      example
   default-language:    Haskell2010
   build-depends:       base <5, machine-learning, ad == 4.*, random-fu,
-                       bifunctors == 4.*, transformers == 0.*, haskeline
+                       bifunctors == 4.*, transformers == 0.*, vector

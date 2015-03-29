@@ -23,15 +23,9 @@ module Data.ML.Cost (
 
 import Control.Applicative
 import Data.Bifunctor
-import Data.Foldable
 import Data.ML.Model
-import Data.Monoid
-import Data.Traversable
-import Debug.Trace
 import Linear
 import Numeric.AD
-import Prelude hiding (sum)
-import System.IO.Unsafe
 
 -- | A cost function for model m is a function taking  the actual
 -- output, the expected output, the model and returning a scalar cost.

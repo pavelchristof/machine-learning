@@ -45,14 +45,11 @@ module Data.ML.Scalar (
     Sigmoid(..)
     ) where
 
-import Control.Applicative
 import Data.Bytes.Serial
-import Data.Foldable
 import Data.ML.Internal.Compose
 import Data.ML.Internal.Scalar
 import Data.ML.Internal.TH
 import Data.ML.Model
-import Data.Traversable
 import Linear
 
 -- | Applies a scalar model m over a structure f.

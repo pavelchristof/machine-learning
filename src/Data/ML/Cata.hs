@@ -14,13 +14,8 @@ Stability   :  experimental
 -}
 module Data.ML.Cata where
 
-import Control.Applicative
-import Data.Bifunctor
-import Data.Foldable
 import Data.ML.Internal.Product
 import Data.ML.Model
-import Data.ML.Scalar
-import Data.Traversable
 import Linear
 
 -- | Folds the fixpoint of f to g using a model m.

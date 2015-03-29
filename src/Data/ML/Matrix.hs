@@ -19,12 +19,7 @@ Provides matrices with size known at compile time and some useful wrappers.
 -}
 module Data.ML.Matrix where
 
-import Control.Applicative
 import Data.Bytes.Serial
-import Data.Foldable
-import Data.ML.Model
-import Data.Monoid
-import Data.Traversable
 import GHC.TypeLits
 import Linear
 import Linear.V

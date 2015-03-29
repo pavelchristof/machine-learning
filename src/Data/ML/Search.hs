@@ -13,13 +13,8 @@ Stability   :  experimental
 -}
 module Data.ML.Search where
 
-import Control.Applicative
-import Data.Bifunctor
-import Data.Foldable
 import Data.ML.Cost
 import Data.ML.Model
-import Data.Reflection
-import Data.Traversable
 import Linear
 
 -- | Adaptive gradient descent working on batches.

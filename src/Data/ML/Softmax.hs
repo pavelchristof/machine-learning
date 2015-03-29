@@ -14,14 +14,9 @@ Stability   :  experimental
 -}
 module Data.ML.Softmax where
 
-import Control.Applicative
 import Data.Bytes.Serial
-import Data.Foldable
-import Data.ML.Internal.Compose
 import Data.ML.Model
-import Data.Traversable
 import Linear
-import Prelude hiding (sum)
 
 -- | Applies the softmax transformation.
 newtype Softmax (f :: * -> *) a = Softmax (V0 a)

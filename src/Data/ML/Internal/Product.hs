@@ -11,9 +11,7 @@ module Data.ML.Internal.Product where
 
 import Control.Applicative
 import Data.Bytes.Serial
-import Data.Foldable
 import Data.Monoid ((<>))
-import Data.Traversable
 import Linear
 
 data Product f g a = Pair (f a) (g a)
