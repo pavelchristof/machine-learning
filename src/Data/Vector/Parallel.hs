@@ -11,9 +11,10 @@ Parallel vector operations.
 module Data.Vector.Parallel where
 
 import           Control.Parallel.Strategies
-import           Data.Monoid
+import           Data.Foldable
 import           Data.Vector (Vector)
 import qualified Data.Vector as Vector
+import           GHC.Conc
 
 -- | Boxed vectors with parallel operations.
 newtype ParVector a = ParVector { runParVector :: Vector a }
@@ -28,15 +29,13 @@ instance Applicative ParVector where
         ParVector (f <*> x `using` parTraversable rseq)
 
 instance Foldable ParVector where
-    foldMap f (ParVector v)
-        | s < 64 = foldMap f v `using` rseq
-        | otherwise = runEval $ do
-            m1 <- rpar $ foldMap f (ParVector l)
-            m2 <- rpar $ foldMap f (ParVector m)
-            m3 <- rseq $ foldMap f (ParVector r)
-            return (m1 <> m2 <> m3)
-      where
-        s = Vector.length v
-        s' = Vector.length v'
-        (l, v') = Vector.splitAt (s `div` 3) v
-        (m, r) = Vector.splitAt (s' `div` 2) v'
+    foldMap f = fold . parMap rseq (foldMap f) . chunk
+
+-- | Splits a vector into a sensible number of parts.
+chunk :: ParVector a -> [Vector a]
+chunk (ParVector v0) = go v0
+  where
+    go v | Vector.length v <= n = [v]
+         | otherwise = let (l, r) = Vector.splitAt n v
+                       in l : go r
+    n = (Vector.length v0 `div` (numCapabilities * 4)) + 1
