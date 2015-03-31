@@ -64,6 +64,10 @@ driver = do
     setTrainingSet (dataset 6)
     setTestSet (dataset 15)
     setCostFun cost
+
+    load "models/parens.bm"
+    timed (test isOk)
+
     runReplT (driverRepl "example/Parens.hs")
 
 main :: IO ()

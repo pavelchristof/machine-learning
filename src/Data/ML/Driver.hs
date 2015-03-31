@@ -42,11 +42,15 @@ module Data.ML.Driver (
 
     -- * Printing.
     printModel,
-    printCost
+    printCost,
+
+    -- * Benchmarking.
+    timed
     ) where
 
 import           Control.Monad
 import           Control.Monad.IO.Class
+import           Criterion.Measurement
 import qualified Data.ByteString.Lazy as BS
 import           Data.Bytes.Get
 import           Data.Bytes.Put
@@ -57,6 +61,7 @@ import           Data.ML.Internal.Driver
 import           Data.ML.Model
 import           Data.ML.Search
 import           Data.Random
+import           Data.Vector.Parallel
 import           Linear
 
 -- | Overwrites the model with a randomly generated one.
@@ -146,10 +151,22 @@ test f = do
     testSet <- getTestSet
 
     let testOne (i, o) = f (predict i model) o
-        runTest = liftIO . print . foldMap testOne
+        runTest = liftIO . print . foldMap testOne . ParVector
 
     liftIO $ putStrLn "Training set:"
     runTest trainingSet
 
     liftIO $ putStrLn "Test set:"
     runTest testSet
+
+-- | Measures and prints the time it takes to execute a command.
+timed :: MonadDriver m => MonadIO m => m () -> m ()
+timed m = do
+    liftIO initializeTime
+
+    t0 <- liftIO getTime
+    m
+    t1 <- liftIO getTime
+
+    let msg = "Took " ++ show (t1 - t0) ++ " seconds."
+    liftIO $ putStrLn msg

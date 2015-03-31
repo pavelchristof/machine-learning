@@ -24,6 +24,7 @@ library
                        Data.ML.Search
                        Data.ML.Driver
                        Data.ML.Repl
+                       Data.Vector.Parallel
                        Data.ML.Internal.Compose
                        Data.ML.Internal.Product
                        Data.ML.Internal.Domain
@@ -43,10 +44,11 @@ library
                        bytes >= 0.11 && <1, bytestring >= 0.10,
                        hint >= 0.4.2.2, haskeline >= 0.7,
                        random-fu >= 0.2, rvar >= 0.2,
+                       criterion == 1.*, parallel == 3.*,
                        template-haskell
   hs-source-dirs:      src
   default-language:    Haskell2010
-  ghc-options:         -W
+  ghc-options:         -W -O2
 
 executable example
   main-is:             Example.hs
@@ -54,6 +56,7 @@ executable example
   default-language:    Haskell2010
   build-depends:       base <5, machine-learning, ad == 4.*, random-fu,
                        bifunctors == 4.*, transformers == 0.*, vector
+  ghc-options:         -W -O2 -threaded -with-rtsopts=-N
 
 executable parens
   main-is:             Parens.hs
@@ -61,3 +64,4 @@ executable parens
   default-language:    Haskell2010
   build-depends:       base <5, machine-learning, ad == 4.*, random-fu,
                        bifunctors == 4.*, transformers == 0.*, vector, bytes
+  ghc-options:         -W -O2 -threaded -with-rtsopts=-N
