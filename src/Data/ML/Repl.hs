@@ -35,6 +35,7 @@ driverRepl mainFile = do
               , FlexibleInstances
               , ScopedTypeVariables
               , TypeOperators
+              , OverloadedStrings
               ]
         , installedModulesInScope := True
         ]

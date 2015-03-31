@@ -26,15 +26,22 @@ class (MonadIO m, Model (ModelOf m), Floating (ScalarOf m)) => MonadDriver m whe
     setModel :: ModelOf m (ScalarOf m) -> m ()
     getModel :: m (ModelOf m (ScalarOf m))
 
-    setDataSet :: DataSet (ModelOf m) (ScalarOf m) -> m ()
-    getDataSet :: m (DataSet (ModelOf m) (ScalarOf m))
+    setTrainingSet :: DataSet (ModelOf m) (ScalarOf m) -> m ()
+    getTrainingSet :: m (DataSet (ModelOf m) (ScalarOf m))
+
+    setTestSet :: DataSet (ModelOf m) (ScalarOf m) -> m ()
+    getTestSet :: m (DataSet (ModelOf m) (ScalarOf m))
 
     setCostFun :: Cost (ModelOf m) -> m ()
     getCostFun :: m (Cost (ModelOf m))
 
+type InputOf m = Input (ModelOf m) (ScalarOf m)
+type OutputOf m = Output (ModelOf m) (ScalarOf m)
+
 data DriverEnv model scalar = DriverEnv {
     model :: IORef (model scalar),
-    dataSet :: IORef (DataSet model scalar),
+    trainingSet :: IORef (DataSet model scalar),
+    testSet :: IORef (DataSet model scalar),
     costFun :: IORef (Cost model)
 }
 
@@ -54,8 +61,11 @@ instance (MonadIO m, Model model, Floating scalar) => MonadDriver (DriverT model
     setModel m = DriverT $ asks model >>= liftIO . flip writeIORef m
     getModel = DriverT $ asks model >>= liftIO . readIORef
 
-    setDataSet ds = DriverT $ asks dataSet >>= liftIO . flip writeIORef ds
-    getDataSet = DriverT $ asks dataSet >>= liftIO . readIORef
+    setTrainingSet ds = DriverT $ asks trainingSet >>= liftIO . flip writeIORef ds
+    getTrainingSet = DriverT $ asks trainingSet >>= liftIO . readIORef
+
+    setTestSet ds = DriverT $ asks testSet >>= liftIO . flip writeIORef ds
+    getTestSet = DriverT $ asks testSet >>= liftIO . readIORef
 
     setCostFun c = DriverT $ asks costFun >>= liftIO . flip writeIORef c
     getCostFun = DriverT $ asks costFun >>= liftIO . readIORef
@@ -73,6 +83,7 @@ runDriverT :: Additive model => Num scalar => MonadIO m
            => DriverT model scalar m a -> m a
 runDriverT (DriverT m) = do
     model <- liftIO $ newIORef zero
-    dataSet <- liftIO $ newIORef mempty
+    trainingSet <- liftIO $ newIORef mempty
+    testSet <- liftIO $ newIORef mempty
     costFun <- liftIO $ newIORef 0
     runReaderT m DriverEnv {..}

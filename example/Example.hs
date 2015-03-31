@@ -5,6 +5,7 @@ import           Control.Monad
 import           Data.Bifunctor
 import           Data.List
 import           Data.ML
+import           Data.Random
 import           Data.ML.Repl
 import           Data.Vector (Vector)
 import qualified Data.Vector as Vector
@@ -22,11 +23,7 @@ instance Bounded Letter where
 
 type ExampleModel
     = MonoidHom (OrdDomain Letter) (Matrix' 5)
-  :>> AffineMap (Matrix' 5) (V 5)
-  :>> Over (V 5) Sigmoid
-  :>> AffineMap (V 5) (V 5)
-  :>> Over (V 5) Sigmoid
-  :>> AffineMap (V 5) Scalar
+  :>> AffineMap (Matrix' 5) Scalar
   :>> Sigmoid
 
 cost :: Cost ExampleModel
@@ -38,15 +35,21 @@ evenCount x xs = length (elemIndices x xs) `rem` 2 == 0
 isAccepted :: String -> Bool
 isAccepted s = evenCount 'a' s && evenCount 'b' s
 
-dataset :: Vector (Const [Letter] Double, Scalar Double)
-dataset = Vector.fromList
-        $ map (bimap (Const . map Letter) Scalar)
-        $ map (\s -> (s, if isAccepted s then 1 else 0))
-        $ [0 .. 7] >>= flip replicateM ['a', 'b']
+dataset :: Int -> Vector (Const [Letter] Double, Scalar Double)
+dataset n = Vector.fromList
+          $ map (bimap (Const . map Letter) Scalar)
+          $ map (\s -> (s, if isAccepted s then 1 else 0))
+          $ [0 .. n] >>= flip replicateM ['a', 'b']
+
+isOk :: Scalar Double -> Scalar Double -> CountCorrect
+isOk x y = if abs (x - y) < 0.5
+              then correct
+              else incorrect
 
 driver :: Driver ExampleModel Double ()
 driver = do
-    setDataSet dataset
+    setTrainingSet (dataset 6)
+    setTestSet (dataset 15)
     setCostFun cost
     runReplT (driverRepl "example/Example.hs")
 

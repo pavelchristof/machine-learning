@@ -45,18 +45,23 @@ runReplT (ReplT m) = do
       Left err -> throwM err
       Right val -> return val
 
-repl :: forall m. Typeable m => MonadMask m => MonadIO m => ReplT m ()
+repl :: Typeable m => MonadMask m => MonadIO m => ReplT m ()
 repl = do
     inputState <- getInputState
     maybeLine <- liftIO $ queryInput inputState $ getInputLine "> "
     case maybeLine of
       Nothing -> return ()
       Just line -> do
-        result <- catch
-            (Right <$> interpret line (as :: m ()))
-            (return . Left)
-        either (liftIO . putStrLn . formatError) lift result
+        isolate $ do
+            command <- interpret line infer
+            lift command
         repl
+
+isolate :: forall m. MonadIO m => MonadMask m => ReplT m () -> ReplT m ()
+isolate m = catches m [Handler handleInterpError, Handler handleAny]
+  where
+    handleInterpError = liftIO . putStrLn . formatError
+    handleAny (_ :: SomeException) = return ()
 
 formatError :: InterpreterError -> String
 formatError (UnknownError s) = s
