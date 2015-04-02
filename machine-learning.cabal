@@ -33,7 +33,7 @@ library
                        Data.ML.Internal.Repl
                        Data.ML.Internal.TH
   default-extensions:  FlexibleContexts, FlexibleInstances, ScopedTypeVariables,
-                       TypeOperators, AutoDeriveTypeable
+                       TypeOperators, AutoDeriveTypeable, PatternSynonyms
   build-depends:       base <5,
                        linear >= 1.18 && <2, ad == 4.*,
                        containers >= 0.5 && <1, keys == 3.*, vector >= 0.10,

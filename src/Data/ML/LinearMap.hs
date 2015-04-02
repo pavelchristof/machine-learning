@@ -20,14 +20,16 @@ import Data.ML.Model
 import Linear
 
 -- | A linear map.
-newtype LinearMap f g a = LinearMap (Compose g f a)
+newtype LinearMap f g a = LinearMap' (Compose g f a)
     deriving (Functor, Applicative, Foldable, Traversable, Additive, Metric)
 
+pattern LinearMap m = LinearMap' (Compose m)
+
 instance (Serial1 f, Serial1 g) => Serial1 (LinearMap f g) where
-    serializeWith f (LinearMap m) = serializeWith f m
-    deserializeWith f = LinearMap <$> deserializeWith f
+    serializeWith f (LinearMap' m) = serializeWith f m
+    deserializeWith f = LinearMap' <$> deserializeWith f
 
 instance (Metric f, Functor g) => Model (LinearMap f g) where
     type Input (LinearMap f g) = f
     type Output (LinearMap f g) = g
-    predict f (LinearMap (Compose m)) = fmap (dot f) m
+    predict f (LinearMap m) = fmap (dot f) m

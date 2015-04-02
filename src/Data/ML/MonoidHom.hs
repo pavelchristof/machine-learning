@@ -28,16 +28,18 @@ import Linear
 
 -- | A homomorphism from the free monoid over the given domain to
 -- a multiplicative monoid @m a@.
-newtype MonoidHom dom m a = MonoidHom (Compose dom m a)
+newtype MonoidHom dom m a = MonoidHom' (Compose dom m a)
     deriving (Show, Functor, Applicative, Foldable, Traversable, Additive, Metric)
 
+pattern MonoidHom m = MonoidHom' (Compose m)
+
 instance (Serial1 dom, Serial1 m) => Serial1 (MonoidHom dom m) where
-    serializeWith f (MonoidHom m) = serializeWith f m
-    deserializeWith f = MonoidHom <$> deserializeWith f
+    serializeWith f (MonoidHom' m) = serializeWith f m
+    deserializeWith f = MonoidHom' <$> deserializeWith f
 
 instance (Indexable dom, Multiplicative m) => Model (MonoidHom dom m) where
     type Input (MonoidHom dom m) = Const [Key dom]
     type Output (MonoidHom dom m) = m
 
-    predict input (MonoidHom (Compose m)) =
+    predict input (MonoidHom m) =
         getProduct1 $ foldMap (Product1 . index m) (getConst input)

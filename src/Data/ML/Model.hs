@@ -38,6 +38,8 @@ generate f = traverse (const f) (pure ())
 newtype (f :>> g) a = Chain (Product f g a)
     deriving (Functor, Applicative, Foldable, Traversable, Additive, Metric)
 
+pattern f :>> g = Chain (Pair f g)
+
 instance (Serial1 f, Serial1 g) => Serial1 (f :>> g) where
     serializeWith f (Chain m) = serializeWith f m
     deserializeWith f = Chain <$> deserializeWith f
@@ -45,4 +47,4 @@ instance (Serial1 f, Serial1 g) => Serial1 (f :>> g) where
 instance (Model f, Model g, Output f ~ Input g) => Model (f :>> g) where
     type Input (f :>> g) = Input f
     type Output (f :>> g) = Output g
-    predict x (Chain (Pair f g)) = predict (predict x f) g
+    predict x (f :>> g) = predict (predict x f) g

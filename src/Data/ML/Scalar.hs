@@ -53,18 +53,20 @@ import Data.ML.Model
 import Linear
 
 -- | Applies a scalar model m over a structure f.
-newtype Over f m a = Over (Compose f m a)
+newtype Over f m a = Over' (Compose f m a)
     deriving (Functor, Applicative, Foldable, Traversable, Additive, Metric)
 
+pattern Over m = Over' (Compose m)
+
 instance (Serial1 f, Serial1 g) => Serial1 (Over f g) where
-    serializeWith f (Over m) = serializeWith f m
-    deserializeWith f = Over <$> deserializeWith f
+    serializeWith f (Over' m) = serializeWith f m
+    deserializeWith f = Over' <$> deserializeWith f
 
 instance (Applicative f, Model m, Input m ~ Scalar, Output m ~ Scalar)
          => Model (Over f m) where
     type Input (Over f m) = f
     type Output (Over f m) = f
-    predict x (Over (Compose m)) = predict' <$> x <*> m
+    predict x (Over m) = predict' <$> x <*> m
       where predict' x' m' = getScalar (predict (Scalar x') m')
 
 mkScalarModel [| exp |] "Exp"

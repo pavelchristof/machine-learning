@@ -19,12 +19,14 @@ import Data.ML.Model
 import Linear
 
 -- | Applies the softmax transformation.
-newtype Softmax (f :: * -> *) a = Softmax (V0 a)
+newtype Softmax (f :: * -> *) a = Softmax' (V0 a)
     deriving (Functor, Applicative, Foldable, Traversable, Additive, Metric)
+
+pattern Softmax = Softmax' V0
 
 instance (Serial1 f) => Serial1 (Softmax f) where
     serializeWith _ _ = return ()
-    deserializeWith _ = return (Softmax V0)
+    deserializeWith _ = return Softmax
 
 instance (Functor f, Foldable f) => Model (Softmax f) where
     type Input (Softmax f) = f
