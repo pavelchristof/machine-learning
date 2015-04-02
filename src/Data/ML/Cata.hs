@@ -27,6 +27,9 @@ newtype Cata (f :: (* -> *) -> * -> *) (m :: * -> *) (g :: * -> *) (a :: *) = Ca
 -- | Higher order functor fixpoint.
 newtype Fix1 (f :: (* -> *) -> * -> *) (a :: *) = Fix1 (f (Fix1 f) a)
 
+cata1 :: Functor1 f => (f g a -> g a) -> Fix1 f a -> g a
+cata1 f (Fix1 x) = f (hlmap (cata1 f) x)
+
 instance Functor1 f => Functor (Fix1 f) where
     fmap f (Fix1 x) = Fix1 (hrmap f x)
 
@@ -55,7 +58,7 @@ instance (Functor g, Functor f) => Functor (Tree g f) where
     fmap f (Node l r) = Node (fmap f l) (fmap f r)
 
 instance Functor g => Functor1 (Tree g) where
-    hlmap f (Leaf g) = Leaf g
+    hlmap _ (Leaf g) = Leaf g
     hlmap f (Node l r) = Node (f l) (f r)
 
     hrmap f (Leaf g) = Leaf (fmap f g)
