@@ -101,7 +101,7 @@ evalCostGrad cost batch model = (j, fmap deNaN g)
     deNaN x | isNaN x = 0
             | otherwise = x
 
-data Mean a = Mean a Int
+data Mean a = Mean !a !Int
 
 mean :: a -> Mean a
 mean x = Mean x 1
