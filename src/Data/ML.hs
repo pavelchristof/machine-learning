@@ -5,6 +5,7 @@ module Data.ML (
     module Data.ML.Cost,
     module Data.ML.Domain,
     module Data.ML.Driver,
+    module Data.ML.Repl,
     module Data.ML.LinearMap,
     module Data.ML.Matrix,
     module Data.ML.Model,
@@ -27,6 +28,7 @@ import Data.ML.LinearMap
 import Data.ML.Matrix
 import Data.ML.Model
 import Data.ML.MonoidHom
+import Data.ML.Repl
 import Data.ML.Scalar
 import Data.ML.Search
 import Data.ML.Softmax
