@@ -21,7 +21,7 @@ import Linear
 -- | Folds the fixpoint of f to g using a model m.
 --
 -- The model m should transform @f g@ to @g@.
-newtype Cata (f :: (* -> *) -> * -> *) (m :: * -> *) (g :: * -> *) (a :: *) = Cata (m a)
+newtype Cata (f :: (* -> *) -> * -> *) (m :: * -> *) (a :: *) = Cata (m a)
     deriving (Functor, Applicative, Foldable, Traversable, Additive, Metric)
 
 -- | Higher order functor fixpoint.
@@ -42,10 +42,10 @@ class Functor1 (n :: (* -> *) -> (* -> *)) where
     hlmap :: (g a -> h a) -> n g a -> n h a
     hrmap :: Functor g => (a -> b) -> n g a -> n g b
 
-instance (Functor1 f, Model m, Input m ~ f g, Output m ~ g)
-         => Model (Cata f m g) where
-    type Input (Cata f m g) = Fix1 f
-    type Output (Cata f m g) = g
+instance (Functor1 f, Model m, Input m ~ f (Output m))
+         => Model (Cata f m) where
+    type Input (Cata f m) = Fix1 f
+    type Output (Cata f m) = Output m
     predict (Fix1 x) m@(Cata m') = predict (hlmap (`predict` m) x) m'
 
 -- | Binary tree suitable for use with the catamorphism model.
@@ -64,15 +64,15 @@ instance Functor g => Functor1 (Tree g) where
     hrmap f (Leaf g) = Leaf (fmap f g)
     hrmap f (Node l r) = Node (fmap f l) (fmap f r)
 
-newtype TreeFAlgebra (leaf :: * -> *) (node :: * -> *) a
-    = TreeFAlgebra (Product leaf node a)
+newtype TreeAlgebra (leaf :: * -> *) (node :: * -> *) a
+    = TreeAlgebra (Product leaf node a)
     deriving (Functor, Applicative, Foldable, Traversable, Additive, Metric)
 
 instance ( Model leaf, Model node
          , Output node ~ Output leaf
          , Input node ~ Product (Output leaf) (Output leaf))
-         => Model (TreeFAlgebra leaf node) where
-    type Input (TreeFAlgebra leaf node) = Tree (Input leaf) (Output leaf)
-    type Output (TreeFAlgebra leaf node) = Output leaf
-    predict (Leaf x) (TreeFAlgebra (Pair leaf _)) = predict x leaf
-    predict (Node l r) (TreeFAlgebra (Pair _ node)) = predict (Pair l r) node
+         => Model (TreeAlgebra leaf node) where
+    type Input (TreeAlgebra leaf node) = Tree (Input leaf) (Output leaf)
+    type Output (TreeAlgebra leaf node) = Output leaf
+    predict (Leaf x) (TreeAlgebra (Pair leaf _)) = predict x leaf
+    predict (Node l r) (TreeAlgebra (Pair _ node)) = predict (Pair l r) node
