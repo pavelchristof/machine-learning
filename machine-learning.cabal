@@ -20,6 +20,7 @@ library
                        Data.ML.AffineMap
                        Data.ML.Cata
                        Data.ML.Cost
+                       Data.ML.Index
                        Data.ML.Search
                        Data.ML.Driver
                        Data.ML.Repl

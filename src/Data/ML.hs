@@ -12,6 +12,7 @@ module Data.ML (
     module Data.ML.Scalar,
     module Data.ML.Search,
     module Data.ML.Softmax,
+    module Data.ML.Index,
     module Linear,
     module Linear.V,
     module Numeric.AD
@@ -22,6 +23,7 @@ import Data.ML.AffineMap
 import Data.ML.Cata
 import Data.ML.Cost
 import Data.ML.Driver
+import Data.ML.Index
 import Data.ML.LinearMap
 import Data.ML.Matrix
 import Data.ML.Model
