@@ -21,7 +21,6 @@ module Data.ML.Cost (
     l2reg
     ) where
 
-import Control.Applicative
 import Data.Bifunctor
 import Data.ML.Model
 import Linear
@@ -114,8 +113,8 @@ instance Num a => Monoid (Mean a) where
     Mean x n `mappend` Mean y m = Mean (x + y) (n + m)
 
 -- | Logistic cost function.
-logistic :: Applicative (Output m) => Foldable (Output m) => Cost m
-logistic = Cost (\s _ -> - getMean (foldMap (foldMap mean . uncurry (liftA2 j)) s))
+logistic :: Additive (Output m) => Foldable (Output m) => Cost m
+logistic = Cost (\s _ -> - getMean (foldMap (foldMap mean . uncurry (liftI2 j)) s))
   where
     j actual expected = expected * log (actual + epsilon)
                       + (1 - expected) * log (1 - actual + epsilon)
