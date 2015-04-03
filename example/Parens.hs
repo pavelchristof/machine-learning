@@ -12,6 +12,7 @@ import           Data.ML.Repl
 import           Data.String
 import           Data.Bytes.Serial
 import           GHC.Generics
+import           Data.Total.Array
 import           Data.Vector (Vector)
 import qualified Data.Vector as Vector
 
@@ -32,7 +33,7 @@ instance IsString [Paren] where
             fromChar _   = error "Not a paren."
 
 type ExampleModel
-    = MonoidHom (OrdDomain Paren) (Matrix' 6)
+    = MonoidHom (TotalArray Paren) (Matrix' 6)
   :>> AffineMap (Matrix' 6) Scalar
   :>> Sigmoid
 

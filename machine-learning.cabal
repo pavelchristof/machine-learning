@@ -11,7 +11,6 @@ cabal-version:       >=1.10
 
 library
   exposed-modules:     Data.ML
-                       Data.ML.Domain
                        Data.ML.Model
                        Data.ML.Scalar
                        Data.ML.Softmax
@@ -27,7 +26,6 @@ library
                        Data.Vector.Parallel
                        Data.ML.Internal.Compose
                        Data.ML.Internal.Product
-                       Data.ML.Internal.Domain
                        Data.ML.Internal.Scalar
                        Data.ML.Internal.Driver
                        Data.ML.Internal.Repl
@@ -55,13 +53,15 @@ executable example
   hs-source-dirs:      example
   default-language:    Haskell2010
   build-depends:       base <5, machine-learning, ad == 4.*, random-fu,
-                       bifunctors == 4.*, transformers == 0.*, vector
-  ghc-options:         -W -O2 -threaded -with-rtsopts=-N
+                       bifunctors == 4.*, transformers == 0.*, vector,
+                       total-maps >= 1.0.0.1
+  ghc-options:         -W -O2 -threaded -rtsopts
 
 executable parens
   main-is:             Parens.hs
   hs-source-dirs:      example
   default-language:    Haskell2010
   build-depends:       base <5, machine-learning, ad == 4.*, random-fu,
-                       bifunctors == 4.*, transformers == 0.*, vector, bytes
-  ghc-options:         -W -O2 -threaded -with-rtsopts=-N
+                       bifunctors == 4.*, transformers == 0.*, vector, bytes,
+                       total-maps >= 1.0.0.1
+  ghc-options:         -W -O2 -threaded -rtsopts

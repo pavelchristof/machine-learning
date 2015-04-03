@@ -7,6 +7,7 @@ import           Data.List
 import           Data.ML
 import           Data.Random
 import           Data.ML.Repl
+import           Data.Total.Array
 import           Data.Vector (Vector)
 import qualified Data.Vector as Vector
 import           Control.Monad.IO.Class
@@ -22,7 +23,7 @@ instance Bounded Letter where
     maxBound = Letter 'b'
 
 type ExampleModel
-    = MonoidHom (OrdDomain Letter) (Matrix' 5)
+    = MonoidHom (TotalArray Letter) (Matrix' 5)
   :>> AffineMap (Matrix' 5) Scalar
   :>> Sigmoid
 

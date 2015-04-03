@@ -3,7 +3,6 @@ module Data.ML (
     module Data.ML.AffineMap,
     module Data.ML.Cata,
     module Data.ML.Cost,
-    module Data.ML.Domain,
     module Data.ML.Driver,
     module Data.ML.Repl,
     module Data.ML.LinearMap,
@@ -22,7 +21,6 @@ import Control.Applicative
 import Data.ML.AffineMap
 import Data.ML.Cata
 import Data.ML.Cost
-import Data.ML.Domain
 import Data.ML.Driver
 import Data.ML.LinearMap
 import Data.ML.Matrix
