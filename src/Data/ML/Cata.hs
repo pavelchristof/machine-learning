@@ -14,6 +14,7 @@ Stability   :  experimental
 -}
 module Data.ML.Cata where
 
+import Data.Bytes.Serial
 import Data.ML.Internal.Product
 import Data.ML.Model
 import Linear
@@ -42,6 +43,10 @@ class Functor1 (n :: (* -> *) -> (* -> *)) where
     hlmap :: (g a -> h a) -> n g a -> n h a
     hrmap :: Functor g => (a -> b) -> n g a -> n g b
 
+instance Serial1 m => Serial1 (Cata f m) where
+    serializeWith f (Cata m) = serializeWith f m
+    deserializeWith f = Cata <$> deserializeWith f
+
 instance (Functor1 f, Model m, Input m ~ f (Output m))
          => Model (Cata f m) where
     type Input (Cata f m) = Fix1 f
@@ -67,6 +72,10 @@ instance Functor g => Functor1 (Tree g) where
 newtype TreeAlgebra (leaf :: * -> *) (node :: * -> *) a
     = TreeAlgebra (Product leaf node a)
     deriving (Functor, Applicative, Foldable, Traversable, Additive, Metric)
+
+instance (Serial1 leaf, Serial1 node) => Serial1 (TreeAlgebra leaf node) where
+    serializeWith f (TreeAlgebra m) = serializeWith f m
+    deserializeWith f = TreeAlgebra <$> deserializeWith f
 
 instance ( Model leaf, Model node
          , Output node ~ Output leaf
