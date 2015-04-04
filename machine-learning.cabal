@@ -56,6 +56,7 @@ library
   hs-source-dirs:      src
   default-language:    Haskell2010
   ghc-options:         -W -O2
+  ghc-prof-options:    -fprof-auto
 
 executable example
   main-is:             Example.hs
@@ -64,7 +65,8 @@ executable example
   build-depends:       base <5, machine-learning, ad == 4.*, random-fu,
                        transformers == 0.*, vector,
                        total-maps >= 1.0.0.1
-  ghc-options:         -W -O2 -threaded -rtsopts
+  ghc-options:         -W -O2 -threaded -rtsopts "-with-rtsopts=-A512m -n4m -N"
+  ghc-prof-options:    -fprof-auto
 
 executable parens
   main-is:             Parens.hs
@@ -73,4 +75,16 @@ executable parens
   build-depends:       base <5, machine-learning, ad == 4.*, random-fu,
                        transformers == 0.*, vector, bytes,
                        total-maps >= 1.0.0.1
-  ghc-options:         -W -O2 -threaded -rtsopts
+  ghc-options:         -W -O2 -threaded -rtsopts "-with-rtsopts=-A512m -n4m -N"
+  ghc-prof-options:    -fprof-auto
+
+executable sentiment
+  main-is:             Sentiment.hs
+  hs-source-dirs:      example
+  default-language:    Haskell2010
+  build-depends:       base <5, machine-learning, ad == 4.*, random-fu,
+                       transformers == 0.*, vector, bytes, containers,
+                       total-maps >= 1.0.0.1, cassava >= 0.4, text,
+                       bytestring, reflection, attoparsec
+  ghc-options:         -W -O2 -threaded -rtsopts "-with-rtsopts=-A512m -n4m -N"
+  ghc-prof-options:    -fprof-auto
