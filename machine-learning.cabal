@@ -23,6 +23,7 @@ library
                        Data.ML.Index
                        Data.ML.Search
                        Data.ML.Driver
+                       Data.ML.Folds
                        Data.ML.Repl
                        Data.Vector.Parallel
                        Data.ML.Internal.Compose

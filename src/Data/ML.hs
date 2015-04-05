@@ -5,6 +5,7 @@ module Data.ML (
     module Data.ML.Cost,
     module Data.ML.Driver,
     module Data.ML.Repl,
+    module Data.ML.Folds,
     module Data.ML.LinearMap,
     module Data.ML.Matrix,
     module Data.ML.Model,
@@ -24,6 +25,7 @@ import Data.ML.AffineMap
 import Data.ML.Cata
 import Data.ML.Cost
 import Data.ML.Driver
+import Data.ML.Folds
 import Data.ML.Index
 import Data.ML.Internal.Product
 import Data.ML.LinearMap
