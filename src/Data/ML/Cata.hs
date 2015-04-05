@@ -54,6 +54,9 @@ instance HSerial1 f => Serial1 (Fix1 f) where
 cata1 :: HFunctor f => (f g a -> g a) -> Fix1 f a -> g a
 cata1 f (Fix1 x) = f (hmap (cata1 f) x)
 
+refix :: HFunctor f => (f (Fix1 f') a -> f' (Fix1 f') a) -> Fix1 f a -> Fix1 f' a
+refix f = cata1 (Fix1 . f)
+
 -- | Folds the fixpoint of f to g using a model m.
 --
 -- The model m should transform @f g@ to @g@.
@@ -66,7 +69,18 @@ instance (HFunctor f, Functor1 f, Model m, Input m ~ f (Output m))
          => Model (Cata f m) where
     type Input (Cata f m) = Fix1 f
     type Output (Cata f m) = Output m
-    predict (Fix1 x) m@(Cata m') = predict (hmap (`predict` m) x) m'
+    predict x (Cata m) = cata1 (`predict` m) x
+
+newtype Refix (f :: (* -> *) -> * -> *) (f' :: (* -> *) -> * -> *) (m :: * -> *) (a :: *)
+    = Refix (m a)
+    deriving (Functor, Applicative, Foldable, Traversable, Additive, Metric, Generic1)
+
+instance Serial1 m => Serial1 (Refix f f' m)
+
+instance (Functor1 f, Functor1 f', HFunctor f, Input m ~ f (Fix1 f'), Output m ~ f' (Fix1 f'), Model m) => Model (Refix f f' m) where
+    type Input (Refix f f' m) = Fix1 f
+    type Output (Refix f f' m) = Fix1 f'
+    predict x (Refix m) = refix (`predict` m) x
 
 -- | Binary tree suitable for use with the catamorphism model.
 data Tree g f a

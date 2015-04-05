@@ -1,105 +1,203 @@
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedLists #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DeriveFoldable #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE DataKinds #-}
-import           Data.ML
-import           Data.Attoparsec.Text
-import           Data.Text (Text)
-import           Data.Total.Array.Subset
-import           System.Exit
-import           Data.Foldable
+
 import           Control.Monad
-import qualified Data.Set as Set
-import qualified Data.Text as Text
-import           Data.Typeable
-import qualified Data.Text.IO as Text
-import           Data.Vector (Vector)
-import qualified Data.Vector as Vector
+import           Data.Attoparsec.Text
 import           Data.Bifunctor
+import           Data.Bytes.Serial
 import           Data.Char
+import           Data.Foldable
+import           Data.ML
 import           Data.Random
 import           Data.Reflection
+import qualified Data.Set as Set
+import           Data.Text (Text)
+import qualified Data.Text as Text
+import qualified Data.Text.IO as Text
+import           Data.Total.Array.Subset
+import           Data.Typeable
+import           Data.Vector (Vector)
+import qualified Data.Vector as Vector
+import           GHC.Generics
+import           System.Exit
 
-type WordVec = V 10
-type TreeBank = Tree (Const Text)
-type Sentiments = V 2
+--------------------------------------------------------------------------------
+-- Data structures
+--------------------------------------------------------------------------------
 
-type Fold s = TreeAlgebra
-    (Index (TotalSubsetArray s Text) WordVec)
-    (AffineMap (Product WordVec WordVec) WordVec :>> Over WordVec Tanh)
+data Tagged (tag :: *) (f :: (* -> *) -> * -> *)
+            (g :: * -> *) (a :: *) = Tagged !tag !(f g a)
+    deriving (Functor, Foldable, Traversable)
+
+instance Functor1 f => Functor1 (Tagged tag f) where
+
+type TreeBankF = Tree (Const Text)
+type TaggedTreeBankF a = Tagged a (Tree (Const Text))
+type SentimentsF = Tagged Double (Tree V0)
+
+type TreeBank = Fix1 TreeBankF
+type TaggedTreeBank a = Fix1 (TaggedTreeBankF a)
+type Sentiments = Fix1 SentimentsF
+
+untag :: Fix1 (Tagged tag f) a -> Fix1 f a
+untag _ = _
+
+onlyTags :: TaggedTreeBank Double a -> Sentiments a
+onlyTags = _
+
+mapTag :: (tag -> tag') -> Fix1 (Tagged tag g) a -> Fix1 (Tagged tag' g) a
+mapTag f = refix _
+
+--------------------------------------------------------------------------------
+-- Model
+--------------------------------------------------------------------------------
+
+type WordVec = Scalar
+
+type VecTable s = Index (TotalSubsetArray s Text) WordVec
+type Combinator = AffineMap (Product WordVec WordVec) WordVec :>> Over WordVec Tanh
+
+newtype Fold s a = Fold (Product (VecTable s) Combinator a)
+    deriving (Functor, Foldable, Traversable, Generic1)
+
+deriving instance Subset s Text => Applicative (Fold s)
+deriving instance Subset s Text => Additive (Fold s)
+deriving instance Subset s Text => Metric (Fold s)
+instance Subset s Text => Serial1 (Fold s)
+
+instance Subset s Text => Model (Fold s) where
+    type Input (Fold s) = TreeBankF Sentiments
+    type Output (Fold s) = Sentiments
 
 type SentimentModel s
-    = Cata TreeBank (Fold s)
-  :>> AffineMap WordVec Sentiments
-  :>> Softmax Sentiments
+    = Cata TreeBankF (Fold s)
+
+--------------------------------------------------------------------------------
+-- Cost function
+--------------------------------------------------------------------------------
 
 cost :: Subset s Text => Cost (SentimentModel s)
-cost = logistic + 0.01 * l2reg
+cost =  0.01 * l2reg
 
-tweetParser :: Parser (Text, Int)
-tweetParser = do
-    takeTill (==',')
-    char ','
+--------------------------------------------------------------------------------
+-- Driver
+--------------------------------------------------------------------------------
+
+driver :: Subset s Text
+       => DataSet (SentimentModel s) Double -- ^ The training set.
+       -> DataSet (SentimentModel s) Double -- ^ The test set.
+       -> Proxy s
+       -> Driver (SentimentModel s) Double ()
+driver trainingSet testSet _ = do
+      setCostFun cost
+      setTrainingSet trainingSet
+      setTestSet testSet
+
+      genModel (uniform (-0.01) 0.01)
+      timed (train 30)
+
+      save "models/sentiment.bm"
+
+--------------------------------------------------------------------------------
+-- Parser
+--------------------------------------------------------------------------------
+
+treeBankLeaf :: Parser (TaggedTreeBank Int a)
+treeBankLeaf = do
     s <- decimal
-    char ','
-    takeTill (==',')
-    char ','
-    t <- takeTill isEndOfLine
-    endOfLine
-    return (t, s)
+    skipSpace
+    t <- takeTill (== ')')
+    return (Fix1 $ Tagged s (Leaf (Const t)))
 
-tweetsParser :: Parser (Vector (Text, Int))
-tweetsParser = do
-    tweets <- many tweetParser
-    endOfInput
-    return (Vector.fromList tweets)
+treeBankNode :: Parser (TaggedTreeBank Int a)
+treeBankNode = do
+    s <- decimal
+    skipSpace
+    l <- treeBank
+    skipSpace
+    r <- treeBank
+    return (Fix1 $ Tagged s (Node l r))
 
-loadTweets :: IO (Vector (Text, Int))
-loadTweets = do
-    content <- Text.readFile "data/tweets.csv"
-    let result = parseOnly tweetsParser content
+treeBank :: Parser (TaggedTreeBank Int a)
+treeBank = do
+    char '('
+    v <- treeBankNode <|> treeBank
+    char ')'
+    return v
+
+treeBanks :: Parser [TaggedTreeBank Int a]
+treeBanks = sepBy' treeBank endOfLine
+
+parseFile :: FilePath -> IO [TaggedTreeBank Int a]
+parseFile filePath = do
+    content <- Text.readFile filePath
+    let result = parseOnly treeBanks content
     either die return result
 
-tokenize :: Text -> [Text]
-tokenize = Text.words
-         . Text.toLower
-         . Text.filter (\c -> isAlphaNum c || isSpace c)
+--------------------------------------------------------------------------------
+-- Preprocessing
+--------------------------------------------------------------------------------
 
-makeTree :: [Text] -> Fix1 TreeBank a
-makeTree [x] = Fix1 $ Leaf (Const x)
-makeTree (x:xs) = Fix1 $ Node (makeTree [x]) (makeTree xs)
-makeTree _ = error "Empty sentence!"
+preprocess :: Text -> Text
+preprocess = Text.toLower
 
-makeSentiment :: Int -> Sentiments Double
-makeSentiment 0 = V [1, 0]
-makeSentiment 1 = V [0, 1]
-makeSentiment _ = error "Invalid sentiment."
+sentToReal :: Int -> Double
+sentToReal 0 = 1 / 10
+sentToReal 1 = 3 / 10
+sentToReal 2 = 5 / 10
+sentToReal 3 = 7 / 10
+sentToReal 4 = 9 / 10
+sentToReal _ = error "Wrong sentiment."
 
-isOk :: Sentiments Double -> Sentiments Double -> CountCorrect
-isOk x y = if all id (ok <$> x <*> y)
-              then correct
-              else incorrect
-  where ok a b = abs (a - b) < 0.5
+sentFromReal :: Double -> Int
+sentFromReal x
+    | x >= 0/5 && x <  1/5 = 0
+    | x >= 1/5 && x <  2/5 = 1
+    | x >= 2/5 && x <  3/5 = 2
+    | x >= 3/5 && x <  4/5 = 3
+    | x >= 4/5 && x <= 5/5 = 4
+    | otherwise = error "Wrong sentiment real."
+
+prepareSet :: [TaggedTreeBank Int a] -> Vector (TreeBank a, Sentiments a)
+prepareSet = Vector.fromList . map (\t -> (
+    _ preprocess $ untag t,
+    onlyTags $ mapTag sentToReal t))
+
+--------------------------------------------------------------------------------
+-- Testing
+--------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------
+-- Main
+--------------------------------------------------------------------------------
 
 main :: IO ()
 main = do
-    tweets <- loadTweets
-    let tweets' = Vector.take 10000 tweets
-        sentences = fmap (first tokenize) tweets'
-        wordSet = Set.fromList $ join $ toList $ fmap fst sentences
-        dataSet = fmap (bimap makeTree makeSentiment) sentences
-        (trainingSet, testSet) = Vector.splitAt 1000 dataSet
+    -- Parse the files.
+    trainingSet <- parseFile "data/train.txt"
+    testSet <- parseFile "data/test.txt"
 
-        driver :: Subset s Text => Proxy s -> Driver (SentimentModel s) Double ()
-        driver _ = do
-            setCostFun cost
-            setTrainingSet trainingSet
-            setTestSet testSet
+    -- Extract the word set.
+    let wordSet = _
 
-            genModel (uniform (-0.1) 0.1)
-            timed (train 10)
+    -- Prepare the data sets.
+    let trainingSet' = prepareSet trainingSet
+        testSet' = prepareSet testSet
 
-    reify wordSet $ \p -> runDriverT (driver p)
+    -- Run the driver.
+    reify wordSet $ runDriverT . driver trainingSet' testSet'
