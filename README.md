@@ -15,6 +15,8 @@ automatic differentiation.
 
 The library is fully type safe, including the dimensions of vectors and matrices.
 
+Look at https://github.com/pawel-n/cml for a more complete implementation in Scala.
+
 Example model
 =============
 
